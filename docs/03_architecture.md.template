@@ -1,0 +1,169 @@
+# {{PROJECT_NAME}} - System Architecture
+
+**Last Updated**: {{DATE}}
+
+---
+
+## I. Architecture Overview
+
+{{PROJECT_DESCRIPTION}}
+
+### Selected Pattern: {{ARCHITECTURE_PATTERN}}
+
+---
+
+## II. Architecture Patterns (Reference)
+
+### Pattern A: Monolithic Application
+
+Best for: Single-purpose applications, CLIs, scripts, small-medium projects.
+
+```
+┌─────────────────────────────────────────────┐
+│            Presentation Layer               │
+│         (CLI / Web UI / API)                │
+├─────────────────────────────────────────────┤
+│            Business Logic                   │
+│     (Core application functionality)        │
+├─────────────────────────────────────────────┤
+│             Data Layer                      │
+│   (Database / File System / External APIs)  │
+└─────────────────────────────────────────────┘
+```
+
+**File Structure**:
+```
+src/
+├── cli/           # CLI commands (or api/ for web)
+├── core/          # Business logic
+├── models/        # Data models
+├── utils/         # Utilities
+└── config/        # Configuration
+```
+
+---
+
+### Pattern B: Data Pipeline
+
+Best for: ETL processes, data processing, scientific computing, ML pipelines.
+
+```
+┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐
+│ Ingest  │ → │ Process │ → │ Store   │ → │ Serve   │
+│         │   │         │   │         │   │         │
+│ - APIs  │   │ - Clean │   │ - DB    │   │ - API   │
+│ - Files │   │ - Trans │   │ - Files │   │ - Dash  │
+│ - Scrape│   │ - Valid │   │ - Cache │   │ - Export│
+└─────────┘   └─────────┘   └─────────┘   └─────────┘
+```
+
+**File Structure**:
+```
+src/
+├── ingestion/     # Data loaders
+├── processing/    # Transformations
+├── storage/       # Data persistence
+├── serving/       # Output/API
+└── utils/         # Shared utilities
+```
+
+---
+
+### Pattern C: Microservices / Modular
+
+Best for: Large applications, team projects, independently deployable components.
+
+```
+┌─────────────────────────────────────────────┐
+│              API Gateway                    │
+├─────────────────────────────────────────────┤
+│   ┌─────────┐  ┌─────────┐  ┌─────────┐    │
+│   │Service A│  │Service B│  │Service C│    │
+│   │         │  │         │  │         │    │
+│   │ - Own DB│  │ - Own DB│  │ - Own DB│    │
+│   └────┬────┘  └────┬────┘  └────┬────┘    │
+│        │            │            │          │
+│   ┌────┴────────────┴────────────┴────┐    │
+│   │         Message Queue              │    │
+│   │      (Events / Commands)           │    │
+│   └────────────────────────────────────┘    │
+└─────────────────────────────────────────────┘
+```
+
+**File Structure**:
+```
+services/
+├── service_a/
+│   ├── src/
+│   └── tests/
+├── service_b/
+│   ├── src/
+│   └── tests/
+└── shared/        # Shared libraries
+```
+
+---
+
+## III. Your Project Structure
+
+**Selected Pattern**: {{ARCHITECTURE_PATTERN}}
+
+```
+{{PROJECT_SLUG}}/
+├── docs/                   # Documentation (Agentic Protocol)
+├── src/{{PROJECT_SLUG}}/   # Main source code
+│   ├── __init__.py
+│   └── [modules...]        # Your modules here
+├── tests/                  # Test suite
+├── scripts/                # Utility scripts
+├── configs/                # Configuration files
+└── .claude/                # Claude Code integration
+```
+
+---
+
+## IV. Component Descriptions
+
+### Core Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| [Component 1] | `src/{{PROJECT_SLUG}}/[module]` | [Description] |
+| [Component 2] | `src/{{PROJECT_SLUG}}/[module]` | [Description] |
+
+### External Dependencies
+
+| Dependency | Version | Purpose |
+|------------|---------|---------|
+| [Package 1] | X.Y.Z | [Why needed] |
+| [Package 2] | X.Y.Z | [Why needed] |
+
+---
+
+## V. Data Flow
+
+```
+[Input] → [Process 1] → [Process 2] → [Output]
+
+Describe your data flow here.
+```
+
+---
+
+## VI. Key Design Decisions
+
+| Decision | Rationale | Date |
+|----------|-----------|------|
+| Adopted {{ARCHITECTURE_PATTERN}} pattern | [Why this pattern fits] | {{DATE}} |
+| [Decision 2] | [Rationale] | [Date] |
+
+---
+
+## VII. Future Considerations
+
+- [ ] [Future enhancement 1]
+- [ ] [Future enhancement 2]
+
+---
+
+**Next Action**: Fill in your specific components and data flow.

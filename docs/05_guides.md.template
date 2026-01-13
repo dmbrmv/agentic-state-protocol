@@ -1,0 +1,205 @@
+# {{PROJECT_NAME}} - Environment & Workflow Guides
+
+**Last Updated**: {{DATE}}
+
+---
+
+## I. Environment Setup
+
+### Prerequisites
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| {{TECH_STACK}} | X.Y.Z | Primary language/runtime |
+| Git | 2.x+ | Version control |
+| [Tool 2] | X.Y.Z | [Purpose] |
+
+### Installation
+
+```bash
+# Clone the repository
+git clone {{REPO_URL}}
+cd {{PROJECT_SLUG}}
+
+# Set up environment
+{{ENVIRONMENT_ACTIVATION}}
+
+# Install dependencies
+{{INSTALL_COMMAND}}
+
+# Verify installation
+{{VERIFY_COMMAND}}
+```
+
+### Environment Variables
+
+Create a `.env` file (or export these):
+
+```bash
+# Required
+export PROJECT_ENV="development"
+
+# Optional
+export DEBUG="true"
+export LOG_LEVEL="info"
+```
+
+---
+
+## II. Development Workflow
+
+### Daily Workflow
+
+```bash
+# 1. Start session
+/boot                           # Load project state
+
+# 2. Work on active task
+# ... make changes ...
+
+# 3. Run checks before commit
+{{LINT_COMMAND}}
+{{TEST_COMMAND}}
+
+# 4. Save progress
+/save                           # Update docs, prepare commit
+
+# 5. Commit changes
+git add -A
+git commit -m "type(scope): description"
+```
+
+### Starting a New Feature
+
+```bash
+# 1. Create feature branch
+git checkout -b feature/my-feature
+
+# 2. Plan the feature
+/feature my-feature             # Creates task and plan
+
+# 3. Implement
+# ... follow the plan ...
+
+# 4. Complete
+/done                           # Mark task complete
+
+# 5. Push and create PR
+git push -u origin feature/my-feature
+```
+
+---
+
+## III. Common Tasks
+
+### Running the Application
+
+```bash
+{{RUN_COMMAND}}
+```
+
+### Running Tests
+
+```bash
+# All tests
+{{TEST_COMMAND}}
+
+# Specific test file
+{{TEST_SINGLE_COMMAND}}
+
+# With coverage
+{{TEST_COVERAGE_COMMAND}}
+```
+
+### Code Quality Checks
+
+```bash
+# Format code
+{{FORMAT_COMMAND}}
+
+# Lint code
+{{LINT_COMMAND}}
+
+# Type check
+{{TYPE_CHECK_COMMAND}}
+```
+
+### Building
+
+```bash
+{{BUILD_COMMAND}}
+```
+
+---
+
+## IV. Agentic Protocol Commands
+
+### Core Commands
+
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `/boot` | Load project state | Start of session |
+| `/save` | Update docs, prepare commit | End of session |
+| `/done` | Mark task complete | After finishing task |
+| `/feature <name>` | Plan new feature | Before starting feature |
+| `/refine <prompt>` | Clarify vague request | When request is unclear |
+
+### Macro Triggers
+
+| Trigger | Action |
+|---------|--------|
+| "BOOT" | Same as `/boot` |
+| "SAVE" | Same as `/save` |
+| "DONE" | Same as `/done` |
+
+---
+
+## V. Troubleshooting
+
+### Common Issues
+
+#### Issue: [Common Problem 1]
+
+**Symptoms**: [What you see]
+
+**Cause**: [Why it happens]
+
+**Solution**:
+```bash
+[Commands to fix]
+```
+
+#### Issue: [Common Problem 2]
+
+**Symptoms**: [What you see]
+
+**Cause**: [Why it happens]
+
+**Solution**:
+```bash
+[Commands to fix]
+```
+
+### Getting Help
+
+1. Check `docs/02_issues.md` for known issues
+2. Search existing documentation
+3. Ask the team / open an issue
+
+---
+
+## VI. Resources
+
+### Documentation
+
+- [Link to external docs]
+- [Link to API reference]
+
+### Tools
+
+- [Link to tool 1]
+- [Link to tool 2]
+
+---
+
+**Next Action**: Complete environment setup and run verification commands.

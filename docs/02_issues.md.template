@@ -1,0 +1,104 @@
+# {{PROJECT_NAME}} - Issue Registry
+
+**Total Open Issues**: 0
+**Last Updated**: {{DATE}}
+
+---
+
+## I. Issue Schema
+
+| Field | Description |
+|-------|-------------|
+| ID | ISS-XXX format |
+| Title | Brief issue description |
+| Severity | CRITICAL / HIGH / MEDIUM / LOW |
+| Priority | P0 (immediate) / P1 (this sprint) / P2 (backlog) / P3 (nice to have) |
+| Status | OPEN / IN_PROGRESS / RESOLVED / WONT_FIX |
+| Root Cause | Known cause or "Under Investigation" |
+| Workaround | Temporary fix if available |
+| Linked Task | Related task from 01_progress.md |
+| Created | Date issue was created |
+| Resolved | Date issue was resolved (if applicable) |
+
+### Severity Definitions
+
+| Severity | Definition |
+|----------|------------|
+| CRITICAL | System unusable, data loss, security vulnerability |
+| HIGH | Major feature broken, significant impact |
+| MEDIUM | Feature degraded, workaround available |
+| LOW | Minor inconvenience, cosmetic issues |
+
+### Priority Definitions
+
+| Priority | Definition |
+|----------|------------|
+| P0 | Drop everything, fix now |
+| P1 | Fix in current sprint/session |
+| P2 | Add to backlog, fix soon |
+| P3 | Nice to have, fix when convenient |
+
+---
+
+## II. Active Issues
+
+(none yet)
+
+### Template for New Issues
+
+```markdown
+### ISS-XXX: [Title]
+**Severity**: [CRITICAL/HIGH/MEDIUM/LOW]
+**Priority**: [P0/P1/P2/P3]
+**Status**: OPEN
+**Created**: YYYY-MM-DD
+
+**Description**:
+[Detailed description of the issue]
+
+**Steps to Reproduce**:
+1. Step 1
+2. Step 2
+3. Expected: X, Actual: Y
+
+**Root Cause**: Under Investigation
+
+**Workaround**: [None / Description of temporary fix]
+
+**Linked Task**: [Task name from 01_progress.md]
+```
+
+---
+
+## III. Recently Resolved
+
+(none yet)
+
+---
+
+## IV. Issue History
+
+(archive of resolved issues)
+
+---
+
+## V. Issue Statistics
+
+| Metric | Value |
+|--------|-------|
+| Total Issues Created | 0 |
+| Total Issues Resolved | 0 |
+| Average Resolution Time | N/A |
+| Most Common Severity | N/A |
+
+---
+
+## VI. Lessons Learned
+
+| Issue | Lesson | Prevention |
+|-------|--------|------------|
+| (none yet) | | |
+
+---
+
+**Next Action**: When you encounter an issue, add it here using the template above.

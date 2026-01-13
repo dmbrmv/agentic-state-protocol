@@ -1,0 +1,426 @@
+# {{PROJECT_NAME}} - Coding Standards
+
+**Tech Stack**: {{TECH_STACK}}
+**Last Updated**: {{DATE}}
+
+---
+
+## I. Golden Rules
+
+1. **Consistency over preference** - Follow existing patterns in the codebase
+2. **Readability over cleverness** - Code is read more than written
+3. **Explicit over implicit** - Make intentions clear
+4. **Test what matters** - Critical paths need tests
+
+---
+
+## II. Language-Specific Standards
+
+### Python
+
+**Formatter**: `ruff format` (or `black`)
+**Linter**: `ruff check` (or `flake8`)
+**Type Checker**: `pyright` (or `mypy`)
+**Line Length**: 88 characters
+
+```python
+# Imports: stdlib, third-party, local (separated by blank lines)
+import os
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+from myproject.core import utils
+
+
+# Type hints on all public functions
+def process_data(input_path: Path, *, verbose: bool = False) -> dict[str, Any]:
+    """Process data from input file.
+
+    Args:
+        input_path: Path to input file.
+        verbose: Enable verbose output.
+
+    Returns:
+        Processed data as dictionary.
+
+    Raises:
+        FileNotFoundError: If input file doesn't exist.
+    """
+    ...
+
+
+# Classes: PascalCase
+class DataProcessor:
+    """Process and transform data."""
+
+    # Class constants: UPPER_SNAKE_CASE
+    MAX_RETRIES = 3
+
+    def __init__(self, config: dict) -> None:
+        self._config = config  # Private: single underscore
+
+    # Methods: snake_case
+    def run_pipeline(self) -> None:
+        ...
+
+
+# Constants: UPPER_SNAKE_CASE
+DEFAULT_TIMEOUT = 30
+API_BASE_URL = "https://api.example.com"
+```
+
+**Docstrings**: Google format
+```python
+def function(arg1: str, arg2: int) -> bool:
+    """Short description.
+
+    Longer description if needed.
+
+    Args:
+        arg1: Description of arg1.
+        arg2: Description of arg2.
+
+    Returns:
+        Description of return value.
+
+    Raises:
+        ValueError: When arg1 is empty.
+
+    Example:
+        >>> function("test", 42)
+        True
+    """
+```
+
+---
+
+### JavaScript / TypeScript
+
+**Formatter**: `prettier`
+**Linter**: `eslint`
+**Type Checker**: `tsc` (strict mode)
+**Line Length**: 100 characters
+
+```typescript
+// Imports: external, internal, relative (separated)
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+
+import { ApiClient } from '@/lib/api';
+import { formatDate } from '@/utils/date';
+
+import { Button } from './Button';
+
+
+// Interfaces: PascalCase with I prefix (optional)
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+}
+
+// Types: PascalCase
+type ApiResponse<T> = {
+  data: T;
+  error?: string;
+};
+
+// Functions: camelCase
+function processData(input: string): UserData {
+  // ...
+}
+
+// Arrow functions for callbacks
+const handleClick = (event: MouseEvent) => {
+  // ...
+};
+
+// Constants: UPPER_SNAKE_CASE or camelCase for config
+const MAX_RETRIES = 3;
+const apiBaseUrl = process.env.API_URL;
+
+// Classes: PascalCase
+class DataProcessor {
+  private config: Record<string, unknown>;
+
+  constructor(config: Record<string, unknown>) {
+    this.config = config;
+  }
+
+  public async process(): Promise<void> {
+    // ...
+  }
+}
+```
+
+**JSDoc** (for JavaScript):
+```javascript
+/**
+ * Process user data.
+ * @param {string} userId - The user ID.
+ * @param {Object} options - Processing options.
+ * @param {boolean} [options.validate=true] - Whether to validate.
+ * @returns {Promise<UserData>} Processed user data.
+ * @throws {Error} If user not found.
+ */
+async function processUser(userId, options = {}) {
+  // ...
+}
+```
+
+---
+
+### Rust
+
+**Formatter**: `rustfmt`
+**Linter**: `clippy`
+**Line Length**: 100 characters
+
+```rust
+// Imports: std, external, crate (separated)
+use std::collections::HashMap;
+use std::path::Path;
+
+use serde::{Deserialize, Serialize};
+use tokio::fs;
+
+use crate::config::Config;
+use crate::utils::format_date;
+
+
+// Structs: PascalCase
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UserData {
+    pub id: String,
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+}
+
+// Enums: PascalCase, variants PascalCase
+pub enum Status {
+    Active,
+    Inactive,
+    Pending { reason: String },
+}
+
+// Constants: UPPER_SNAKE_CASE
+pub const MAX_RETRIES: u32 = 3;
+const DEFAULT_TIMEOUT: u64 = 30;
+
+// Functions: snake_case
+pub fn process_data(input: &str) -> Result<UserData, Error> {
+    // ...
+}
+
+// Traits: PascalCase
+pub trait Processor {
+    fn process(&self) -> Result<(), Error>;
+}
+
+impl Processor for DataHandler {
+    fn process(&self) -> Result<(), Error> {
+        // ...
+    }
+}
+```
+
+**Documentation**:
+```rust
+/// Process user data from input.
+///
+/// # Arguments
+///
+/// * `input` - The input string to process.
+/// * `config` - Processing configuration.
+///
+/// # Returns
+///
+/// Processed user data or error.
+///
+/// # Errors
+///
+/// Returns error if input is invalid.
+///
+/// # Examples
+///
+/// ```
+/// let result = process_data("test", &config)?;
+/// assert!(result.is_valid());
+/// ```
+pub fn process_data(input: &str, config: &Config) -> Result<UserData, Error> {
+    // ...
+}
+```
+
+---
+
+### Go
+
+**Formatter**: `gofmt`
+**Linter**: `golangci-lint`
+**Line Length**: 120 characters
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "time"
+
+    "github.com/pkg/errors"
+
+    "myproject/internal/config"
+    "myproject/pkg/utils"
+)
+
+// Constants: camelCase (unexported) or PascalCase (exported)
+const (
+    maxRetries     = 3
+    DefaultTimeout = 30 * time.Second
+)
+
+// UserData represents a user's information.
+type UserData struct {
+    ID    string `json:"id"`
+    Name  string `json:"name"`
+    Email string `json:"email,omitempty"`
+}
+
+// Processor defines the processing interface.
+type Processor interface {
+    Process(ctx context.Context) error
+}
+
+// DataHandler handles data processing.
+type DataHandler struct {
+    config *config.Config
+}
+
+// NewDataHandler creates a new DataHandler.
+func NewDataHandler(cfg *config.Config) *DataHandler {
+    return &DataHandler{config: cfg}
+}
+
+// Process processes the data.
+func (h *DataHandler) Process(ctx context.Context) error {
+    // ...
+    return nil
+}
+
+// processData is an unexported helper function.
+func processData(input string) (*UserData, error) {
+    if input == "" {
+        return nil, errors.New("input cannot be empty")
+    }
+    // ...
+    return &UserData{}, nil
+}
+```
+
+---
+
+## III. Git Standards
+
+### Commit Messages
+
+Format: `<type>(<scope>): <description>`
+
+**Types**:
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation only
+- `style`: Formatting, no code change
+- `refactor`: Code restructuring
+- `test`: Adding tests
+- `chore`: Maintenance tasks
+
+**Examples**:
+```
+feat(auth): add JWT token refresh
+fix(api): handle null response from server
+docs(readme): update installation instructions
+refactor(core): extract validation logic to separate module
+test(utils): add unit tests for date formatting
+```
+
+### Branch Names
+
+Format: `<type>/<short-description>`
+
+**Examples**:
+```
+feature/user-authentication
+fix/null-pointer-api
+docs/update-readme
+refactor/extract-validation
+```
+
+---
+
+## IV. Testing Standards
+
+### Test File Naming
+
+| Language | Pattern |
+|----------|---------|
+| Python | `test_<module>.py` or `<module>_test.py` |
+| JavaScript/TS | `<module>.test.ts` or `<module>.spec.ts` |
+| Rust | `<module>.rs` with `#[cfg(test)]` module |
+| Go | `<module>_test.go` |
+
+### Test Structure (AAA Pattern)
+
+```python
+def test_process_data_returns_valid_result():
+    # Arrange
+    input_data = {"key": "value"}
+    processor = DataProcessor()
+
+    # Act
+    result = processor.process(input_data)
+
+    # Assert
+    assert result.is_valid()
+    assert result.key == "value"
+```
+
+### Coverage Requirements
+
+| Type | Minimum |
+|------|---------|
+| Unit Tests | 80% |
+| Integration Tests | Critical paths |
+| E2E Tests | Happy paths |
+
+---
+
+## V. Project-Specific Rules
+
+Add your project-specific coding rules here:
+
+1. [Rule 1]
+2. [Rule 2]
+3. [Rule 3]
+
+---
+
+## VI. Code Review Checklist
+
+Before submitting code:
+
+- [ ] Follows naming conventions
+- [ ] Has appropriate type hints/annotations
+- [ ] Includes docstrings/documentation
+- [ ] Has unit tests for new functionality
+- [ ] Passes linter checks
+- [ ] Passes type checker
+- [ ] No hardcoded secrets/credentials
+- [ ] Handles errors appropriately
+
+---
+
+**Next Action**: Run linter and formatter before committing.

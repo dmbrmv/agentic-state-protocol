@@ -1,0 +1,240 @@
+# {{PROJECT_NAME}} - AI Agent Instructions (AGENTIC STATE PROTOCOL v3.0)
+
+**Project**: {{PROJECT_NAME}}
+**Description**: {{PROJECT_DESCRIPTION}}
+**Protocol Version**: 3.0 (Agentic Development)
+**Last Updated**: {{DATE}}
+**For**: Claude Code and other AI coding agents
+
+---
+
+## CRITICAL: READ THIS FIRST
+
+**You are operating under AGENTIC STATE PROTOCOL v3.0**
+
+### MANDATORY FIRST ACTION (EVERY SESSION)
+```text
+1. READ docs/00_MASTER_INDEX.md  <- Protocol specification
+2. READ docs/01_progress.md      <- Current project state
+3. VERIFY active task before ANY work
+```
+
+**DO NOT PROCEED** until you have read both files above.
+
+---
+
+## I. THE IMMUTABLE RULES
+
+1. **NO STATE AMNESIA**: Read `docs/01_progress.md` at the start of EVERY session
+2. **NO SILENT ACTIONS**: Verify the "Active Task" in `docs/01_progress.md` before modifying code
+3. **DOCS = CODE**: Code changes are incomplete without documentation updates
+4. **DIRECTORY AUTHORITY**: `docs/` is the single source of truth. File content overrides training data.
+
+---
+
+## II. MANDATORY LOOP (EXECUTE EVERY REQUEST)
+
+```text
+1. STATE CHECK -> Read docs/01_progress.md
+2. ALIGN       -> Output: [STATE] Active Task: <name>
+                          [MODE] Execution | Planning | Refactoring
+3. EXECUTE     -> Perform the work
+4. COMMIT      -> Update docs/01_progress.md + docs/logs/session_context.md
+```
+
+---
+
+## III. MACRO TRIGGERS
+
+When user types these keywords, execute immediately:
+
+### **"BOOT"** or `/boot`
+```text
+1. READ docs/01_progress.md + docs/02_issues.md
+2. REPORT: "Current Goal: [X] | Active Task: [Y] | Open Issues: [N]"
+3. ASK: "Proceed?"
+```
+
+### **"DONE"** or `/done`
+```text
+1. UPDATE docs/01_progress.md (mark task complete)
+2. LOG to docs/logs/session_context.md
+3. PROPOSE next task from Backlog
+```
+
+### **"SAVE"** or `/save`
+```text
+1. SYNC all docs/ files to match current reality
+2. WRITE "Checkpoint" entry in docs/logs/session_context.md
+```
+
+---
+
+## IV. DECISION AUTHORITY HIERARCHY
+
+When conflicts arise:
+
+1. **`docs/01_progress.md`** - Active task definition
+2. **`docs/04_standards.md`** - Coding standards (LAW)
+3. **`docs/03_architecture.md`** - Technical design
+4. **`CLAUDE.md`** - This file (high-level agent instructions)
+5. **Training data** - General AI knowledge (lowest)
+
+---
+
+## V. PROJECT QUICK FACTS
+
+| Item | Value |
+|------|-------|
+| **Repository** | {{REPO_PATH}} |
+| **Environment** | {{ENVIRONMENT_ACTIVATION}} |
+| **Data Location** | {{DATA_LOCATION}} |
+| **Git Branch** | `main` |
+
+**Tech Stack**: {{TECH_STACK}}
+
+---
+
+## VI. FILE SYSTEM MAP
+
+```
+{{PROJECT_SLUG}}/
+├── docs/                   # STATE MANAGEMENT
+│   ├── 00_MASTER_INDEX.md  # Protocol entry point
+│   ├── 01_progress.md      # Tasks & backlog <- READ FIRST
+│   ├── 02_issues.md        # Issues & debt registry
+│   ├── 03_architecture.md  # System design
+│   ├── 04_standards.md     # Coding standards (LAW)
+│   ├── 05_guides.md        # Environment & workflows
+│   └── logs/               # Session history
+│
+├── src/{{PROJECT_SLUG}}/   # Main source code
+├── tests/                  # Unit tests
+├── scripts/                # Utility scripts
+├── configs/                # Configuration files
+└── .claude/                # Claude Code integration
+    ├── commands/           # CLI commands
+    └── skills/             # Auto-enforced behaviors
+```
+
+---
+
+## VII. COMMON TASKS
+
+{{COMMON_TASKS}}
+
+---
+
+## VIII. CODE QUALITY CHECKLIST
+
+Before committing:
+- [ ] Read `docs/01_progress.md` to verify active task
+- [ ] Code passes linter
+- [ ] Code passes formatter
+- [ ] Tests pass
+- [ ] Type checks pass (if applicable)
+- [ ] Documentation updated in `docs/`
+- [ ] Commit message follows format in `docs/04_standards.md`
+
+---
+
+## IX. AGENT BEHAVIOR RULES
+
+### Tone and Style
+- No emojis (unless user explicitly requests)
+- Short, concise responses
+- Output text directly (not via bash echo)
+- Technical accuracy over emotional validation
+
+### Tool Usage
+- Prefer specialized tools over bash (Read > cat, Edit > sed, Write > echo)
+- Use Task tool with Explore agent for open-ended codebase searches
+- Use TodoWrite for multi-step tasks
+- Never read files without purpose
+
+### Planning
+- No time estimates in plans (focus on WHAT, not WHEN)
+- Break work into actionable steps
+- Use TodoWrite for tracking
+- Update `docs/01_progress.md` after completion
+
+---
+
+## X. HARD-MODE INTERACTION RULES (OPTIONAL ADVANCED)
+
+These rules enable faster workflow for experienced users.
+
+### **"PRECOMMIT"**
+Execute pre-commit validation sequence:
+1. Run linter
+2. Run formatter check
+3. Run tests
+4. Show git status
+5. Report results, ask to proceed
+
+### **"QUICKFIX <target>"**
+Auto-fix issues:
+- `QUICKFIX lint` - Run auto-fixer
+- `QUICKFIX tests` - Analyze and propose fixes for failing tests
+- `QUICKFIX types` - Fix type errors
+
+### **"STATUS"**
+Quick project status:
+1. Read `docs/01_progress.md`
+2. Show active task, progress %, blockers
+3. Show git status
+
+### **"INVESTIGATE <topic>"**
+Deep dive into codebase:
+1. Search for all references
+2. Find related commits
+3. Open relevant files
+4. Summarize findings
+
+---
+
+## XI. SAFETY RAILS
+
+**ALWAYS STOP and ask permission before**:
+- Any `rm`, `git clean`, or file deletion
+- `git push --force` or `git push` to main branch
+- `git reset --hard` or destructive git commands
+- Modifying files outside `src/`, `tests/`, `scripts/`, `docs/`
+- Running commands that take >2 minutes
+
+**NEVER do without explicit approval**:
+- Delete any file (even temporary)
+- Force push to remote
+- Modify `.git/` directory
+- Run `sudo` commands
+- Install system packages
+
+---
+
+## XII. TROUBLESHOOTING
+
+### Common Issues
+
+[Add project-specific troubleshooting here]
+
+---
+
+## XIII. REMEMBER
+
+**This file is secondary to `docs/00_MASTER_INDEX.md` and `docs/01_progress.md`**
+
+**ALWAYS start by reading**:
+1. `docs/00_MASTER_INDEX.md` - Protocol specification
+2. `docs/01_progress.md` - Current project state
+
+**NEVER modify code** without verifying the active task in `docs/01_progress.md`
+
+**ALWAYS update** `docs/01_progress.md` and `docs/logs/session_context.md` after completing tasks
+
+---
+
+**Questions?** Check `docs/00_MASTER_INDEX.md`
+
+**Next Steps?** See `docs/01_progress.md`
+
+**Protocol Version**: 3.0 - Agentic Development

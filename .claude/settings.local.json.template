@@ -1,0 +1,54 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(docs/**)",
+      "Read(src/**)",
+      "Read(tests/**)",
+      "Read(scripts/**)",
+      "Read(configs/**)",
+      "Read(CLAUDE.md)",
+      "Read(README.md)",
+      "Read(pyproject.toml)",
+      "Read(package.json)",
+      "Read(Cargo.toml)",
+      "Read(go.mod)",
+      "Write(docs/**)",
+      "Write(src/**)",
+      "Write(tests/**)",
+      "Write(scripts/**)",
+      "Edit(docs/**)",
+      "Edit(src/**)",
+      "Edit(tests/**)",
+      "Edit(scripts/**)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git show:*)",
+      "Bash(ls:*)",
+      "Bash(pwd:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(echo:*)",
+      "WebSearch",
+      "WebFetch"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git push --force:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(sudo:*)",
+      "Write(.git/**)",
+      "Edit(.git/**)"
+    ]
+  },
+  "settings": {
+    "model": "claude-sonnet-4-20250514",
+    "contextWindow": 200000,
+    "maxTokens": 8192
+  }
+}
