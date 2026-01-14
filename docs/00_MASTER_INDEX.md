@@ -97,6 +97,7 @@ When conflicts arise:
 
 Available commands via `.claude/commands/`:
 
+### Core Session Commands
 | Command | Purpose |
 |---------|---------|
 | `/boot` | Wake up: Load state, summarize context |
@@ -105,16 +106,38 @@ Available commands via `.claude/commands/`:
 | `/feature <name>` | New feature: Plan before coding |
 | `/refine <prompt>` | Clarify: Turn vague request into actionable prompt |
 
+### Development Automation
+| Command | Purpose |
+|---------|---------|
+| `/test` | Run tests with smart failure analysis and fix suggestions |
+| `/review` | Code review: architecture, standards, security checks |
+| `/debug <issue>` | Structured debugging with root cause analysis |
+| `/status` | Project health dashboard: git, tests, docs, dependencies |
+
+### Multi-Agent Coordination
+| Command | Purpose |
+|---------|---------|
+| `/delegate <task>` | Spawn parallel Claude agents for subtasks |
+| `/sync` | Merge work from parallel agent sessions |
+
 ---
 
 ## VI. SKILLS (Auto-Enforced)
 
 Available skills via `.claude/skills/`:
 
+### Core Skills
 | Skill | Purpose |
 |-------|---------|
 | `context_manager` | Keep docs synchronized with code changes |
 | `arch_enforcer` | Enforce architecture and coding standards |
+
+### Extended Skills
+| Skill | Purpose |
+|-------|---------|
+| `test_enforcer` | Auto-run tests after code changes, suggest fixes |
+| `parallel_coordinator` | Manage multi-agent delegation with checkpoints |
+| `dependency_tracker` | Track deps, security audit, compatibility check |
 
 ---
 
@@ -141,6 +164,238 @@ project/
 └── .claude/                # Claude Code commands & skills
     ├── commands/           # CLI commands
     └── skills/             # Auto-enforced behaviors
+```
+
+---
+
+## IX. MULTI-AGENT COORDINATION
+
+The protocol supports spawning parallel Claude Task agents for complex work.
+
+### Delegation Model
+- **Supervised Autonomy**: All agent work requires human approval before merge
+- **Scoped Boundaries**: Each agent has explicit file/module boundaries
+- **Checkpoint Requirements**: Agents must checkpoint before completion
+- **Conflict Resolution**: Human resolves any conflicts between agents
+
+### Delegation Workflow
+```text
+1. /delegate <task>  -> Decompose and spawn agents
+2. Agents work in parallel on subtasks
+3. /sync --status    -> Check agent progress
+4. /sync             -> Review and merge completed work
+```
+
+### State Files
+- `docs/06_multi_agent.md` - Multi-agent coordination overview
+- `docs/logs/delegation_registry.md` - Active delegation tracking
+
+---
+
+## X. TESTING AND QUALITY
+
+### Automated Testing
+The `test_enforcer` skill automatically:
+- Runs affected tests after code changes
+- Analyzes failures and suggests fixes
+- Enforces coverage thresholds before `/done`
+
+### Code Review
+The `/review` command checks:
+- Architecture alignment (`docs/03_architecture.md`)
+- Coding standards compliance (`docs/04_standards.md`)
+- Security best practices (secrets, injection, etc.)
+- Test coverage
+
+### Dependency Management
+The `dependency_tracker` skill monitors:
+- Package vulnerabilities (security audit)
+- Outdated dependencies
+- License compliance
+- Compatibility issues
+
+---
+
+## XI. MCP CONFIGURATIONS
+
+MCP server configurations in `.claude/mcp/`:
+
+| Config | Purpose |
+|--------|---------|
+| `test_runners.json` | pytest, jest, cargo test, go test |
+| `linters.json` | ruff, eslint, clippy, golangci-lint |
+| `dependency_auditors.json` | pip-audit, npm audit, cargo audit |
+
+---
+
+## XII. SUBAGENTS
+
+Specialized agents in `.claude/agents/` for delegated tasks:
+
+| Agent | Purpose | Model |
+|-------|---------|-------|
+| `code-simplifier` | Simplify and clean up code after implementation | sonnet |
+| `verify-app` | End-to-end application verification | sonnet |
+| `security-auditor` | Security-focused code review (read-only) | sonnet |
+| `background-verifier` | Long-running verification (cost-effective) | haiku |
+| `ui-verifier` | Browser UI verification (requires Chrome) | sonnet |
+
+### Usage
+
+Subagents are invoked automatically or via commands:
+- `verify-app`: Auto-triggered before `/done`
+- `security-auditor`: Triggered via `/review --security`
+- `background-verifier`: Triggered via `/verify-background`
+- `code-simplifier`: Manually invoked after feature completion
+
+---
+
+## XIII. HOOKS
+
+Automated behaviors via `.claude/hooks/`:
+
+### PostToolUse Hooks
+| Hook | Trigger | Purpose |
+|------|---------|---------|
+| `format-code.sh` | Edit, Write | Auto-format code after changes |
+| `markdown-formatter.py` | Edit, Write | Fix markdown formatting |
+
+### PreToolUse Hooks
+| Hook | Trigger | Purpose |
+|------|---------|---------|
+| `security-check.sh` | Write, Edit, Bash | Block dangerous operations |
+| `validate-changes.sh` | Bash (git commit) | Validate before commits |
+
+### Stop Hooks
+- Verify all tasks complete before stopping
+- Check for unresolved errors
+
+### SubagentStop Hooks
+- Evaluate verification agent findings
+- Ensure issues are addressed before proceeding
+
+---
+
+## XIV. INNER-LOOP COMMANDS
+
+Fast workflow commands with pre-computed context:
+
+| Command | Purpose |
+|---------|---------|
+| `/commit-push-pr <msg>` | Quick commit, push, and create PR |
+| `/quickfix` | Auto-fix linting issues on changed files |
+| `/precommit` | Run all pre-commit checks (lint, format, test, type) |
+| `/investigate <issue>` | Deep investigation with full context |
+| `/verify-background` | Run verification in background |
+| `/browser-test <action>` | Test web UI in Chrome browser |
+
+### Pre-computed Context
+
+These commands use inline bash (`!` prefix) to gather context before execution:
+```markdown
+Current branch: !`git branch --show-current`
+Git status: !`git status --short`
+```
+
+---
+
+## XV. VERIFICATION WORKFLOWS
+
+The `verifier` skill ensures work quality:
+
+### Verification Levels
+| Level | Files Changed | Checks |
+|-------|---------------|--------|
+| Minimal | 1-3 | Affected tests only |
+| Standard | 4-10 | Build + Tests + Lint + Types |
+| Full | 11+ | Everything + Security audit |
+
+### Automatic Triggers
+- Before `/done` command
+- Before `/commit-push-pr`
+- After bug fixes
+
+### Manual Triggers
+- `/verify-background` for comprehensive background check
+- `/precommit` for pre-commit validation
+
+---
+
+## XVI. AUTONOMOUS EXECUTION
+
+See `docs/07_autonomous.md` for detailed configuration.
+
+### Permission Modes
+| Mode | Description |
+|------|-------------|
+| `default` | Ask for approval on dangerous operations |
+| `acceptEdits` | Auto-approve file edits |
+| `dontAsk` | Minimal prompts (caution advised) |
+| `plan` | Read-only exploration mode |
+
+### Auto-Approved Operations
+- Read operations (files, git status)
+- Linters and formatters
+- Test execution
+- Code analysis
+
+### Requires Approval
+- Git commits and pushes
+- Package installations
+- File deletions
+- External API calls
+
+---
+
+## XVII. FILE SYSTEM MAP (EXTENDED)
+
+```
+project/
+├── docs/                   # STATE MANAGEMENT
+│   ├── 00_MASTER_INDEX.md  # Protocol entry point
+│   ├── 01_progress.md      # Current state
+│   ├── 02_issues.md        # Issue tracking
+│   ├── 03_architecture.md  # System design
+│   ├── 04_standards.md     # Coding standards
+│   ├── 05_guides.md        # Environment guides
+│   ├── 06_multi_agent.md   # Multi-agent overview
+│   ├── 07_autonomous.md    # Autonomous execution guide
+│   └── logs/               # Session memory
+│
+├── src/                    # Source code
+├── tests/                  # Test suite
+├── scripts/                # Utility scripts
+├── configs/                # Configuration files
+│
+└── .claude/                # Claude Code configuration
+    ├── commands/           # CLI commands (17 total)
+    │   ├── boot.md, save.md, done.md
+    │   ├── feature.md, refine.md
+    │   ├── test.md, review.md, debug.md, status.md
+    │   ├── delegate.md, sync.md
+    │   ├── commit-push-pr.md, quickfix.md, precommit.md
+    │   ├── investigate.md, verify-background.md, browser-test.md
+    │   │
+    ├── skills/             # Auto-enforced behaviors (6 total)
+    │   ├── context_manager.md, arch_enforcer.md
+    │   ├── test_enforcer.md, parallel_coordinator.md
+    │   ├── dependency_tracker.md, verifier.md
+    │   │
+    ├── agents/             # Specialized subagents (5 total)
+    │   ├── code-simplifier.md, verify-app.md
+    │   ├── security-auditor.md, background-verifier.md
+    │   └── ui-verifier.md
+    │   │
+    ├── hooks/              # Automation hooks (4 total)
+    │   ├── format-code.sh, markdown-formatter.py
+    │   ├── validate-changes.sh, security-check.sh
+    │   │
+    ├── mcp/                # MCP configurations
+    │   ├── test_runners.json
+    │   ├── linters.json
+    │   └── dependency_auditors.json
+    │
+    └── settings.local.json # Local settings (from template)
 ```
 
 ---

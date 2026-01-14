@@ -1,0 +1,424 @@
+# {{PROJECT_NAME}} - Autonomous Execution Guide
+
+**Purpose**: Configure and understand autonomous execution modes for Claude agents.
+**Last Updated**: {{DATE}}
+
+---
+
+## I. Overview
+
+Autonomous execution allows Claude to work with minimal interruptions while maintaining safety guardrails. This guide covers permission modes, safety mechanisms, and best practices.
+
+---
+
+## II. Permission Modes
+
+### Available Modes
+
+| Mode | Prompts | Best For |
+|------|---------|----------|
+| `default` | Ask on dangerous ops | Daily development |
+| `acceptEdits` | Auto-approve edits | Trusted refactoring |
+| `dontAsk` | Minimal prompts | CI/CD pipelines |
+| `bypassPermissions` | No restrictions | Sandboxed environments only |
+| `plan` | Read-only | Exploration/analysis |
+
+### Mode Details
+
+#### `default` (Recommended)
+- Prompts for: commits, pushes, installs, deletes
+- Auto-approves: reads, tests, lints, formats
+- Best balance of speed and safety
+
+#### `acceptEdits`
+- Auto-approves file edits and writes
+- Still prompts for git operations
+- Use when you trust the planned changes
+
+#### `dontAsk`
+- Minimal prompting
+- Still respects deny rules
+- Use for well-defined, low-risk tasks
+
+#### `plan` (Read-Only)
+- Cannot modify files
+- Can read, search, analyze
+- Perfect for investigation and exploration
+
+---
+
+## III. Sandbox Mode
+
+### When to Use Sandbox
+
+Enable sandbox mode for:
+- Long-running autonomous tasks
+- Untrusted or experimental code
+- New project exploration
+- CI/CD pipelines
+
+### Sandbox Capabilities
+
+```json
+{
+  "sandboxMode": true,
+  "sandboxConfig": {
+    "allowNetwork": false,
+    "allowFileSystem": "projectOnly",
+    "maxExecutionTime": 3600,
+    "resourceLimits": {
+      "memory": "2GB",
+      "cpu": "2 cores"
+    }
+  }
+}
+```
+
+### Sandbox Restrictions
+
+- No network access (unless explicitly allowed)
+- File access limited to project directory
+- Cannot modify system files
+- Time-limited execution
+
+---
+
+## IV. Auto-Approved Operations
+
+### Always Safe (Auto-Approve)
+
+| Category | Operations |
+|----------|------------|
+| Reading | `Read`, `Glob`, `Grep`, file inspection |
+| Git Info | `git status`, `git log`, `git diff`, `git branch` |
+| Testing | `pytest`, `npm test`, `cargo test`, `go test` |
+| Linting | `ruff`, `eslint`, `clippy`, `golangci-lint` |
+| Formatting | `prettier`, `black`, `rustfmt`, `gofmt` |
+| Analysis | Type checking, code coverage |
+
+### Conditionally Approved
+
+| Category | Condition |
+|----------|-----------|
+| File Edits | In `acceptEdits` or higher mode |
+| Package Info | `pip list`, `npm outdated` (read-only) |
+| Dependency Audit | Security scans |
+
+### Always Require Approval
+
+| Category | Operations |
+|----------|------------|
+| Git Writes | `commit`, `push`, `merge`, `rebase` |
+| Package Install | `pip install`, `npm install`, `cargo add` |
+| Deletions | `rm`, `git clean` |
+| External | API calls, downloads |
+| Credentials | Any secret/token operations |
+
+---
+
+## V. Hook-Based Safety
+
+### PreToolUse Hooks
+
+Block dangerous operations before they execute:
+
+```json
+{
+  "PreToolUse": [
+    {
+      "matcher": "Write|Edit|Bash",
+      "hooks": [
+        {
+          "type": "command",
+          "command": ".claude/hooks/security-check.sh"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Security Check Script
+
+The `security-check.sh` hook blocks:
+- Modifications to `.env`, credentials, secrets
+- Dangerous commands (`rm -rf /`, force push)
+- System directory modifications
+- Package installations from untrusted sources
+
+### PostToolUse Hooks
+
+Validate and format after changes:
+
+```json
+{
+  "PostToolUse": [
+    {
+      "matcher": "Edit|Write",
+      "hooks": [
+        {
+          "type": "command",
+          "command": ".claude/hooks/format-code.sh"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Stop Hooks
+
+Verify completion before stopping:
+
+```json
+{
+  "Stop": [
+    {
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Verify all tasks complete. Return {\"ok\": true} or {\"ok\": false, \"reason\": \"...\"}"
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## VI. Subagent Autonomy
+
+### Subagent Permission Inheritance
+
+Subagents inherit parent's permission mode unless specified:
+
+```yaml
+---
+name: verify-app
+permissionMode: default  # Override parent's mode
+---
+```
+
+### Subagent Scopes
+
+Limit what subagents can access:
+
+```json
+{
+  "allowedAgentScopes": [
+    "src/**",
+    "tests/**"
+  ],
+  "forbiddenAgentScopes": [
+    "docs/01_progress.md",
+    ".claude/**",
+    ".git/**"
+  ]
+}
+```
+
+### Background Agents
+
+For long-running tasks:
+
+```yaml
+---
+name: background-verifier
+model: haiku  # Cost-effective
+---
+```
+
+- Continue working while agent runs
+- Check progress via output files
+- Results available when complete
+
+---
+
+## VII. Verification Gates
+
+### Before Actions
+
+| Action | Required Verification |
+|--------|----------------------|
+| `/done` | Tests pass, lint clean |
+| `/commit` | Pre-commit checks pass |
+| `/delegate` | Base branch stable |
+| PR creation | Full verification |
+
+### Verification Levels
+
+| Level | Trigger | Checks |
+|-------|---------|--------|
+| Minimal | 1-3 files | Affected tests |
+| Standard | 4-10 files | Build + Tests + Lint |
+| Full | 11+ files | Everything + Security |
+
+### Bypassing Verification
+
+For documentation-only changes:
+
+```bash
+/done --skip-verify
+```
+
+Use sparingly and only for true non-code changes.
+
+---
+
+## VIII. Best Practices
+
+### Daily Development
+
+```json
+{
+  "autonomy": {
+    "permissionMode": "default",
+    "autoApproveReadOnly": true,
+    "autoApproveLinters": true,
+    "autoApproveTests": true
+  }
+}
+```
+
+### Trusted Refactoring
+
+```json
+{
+  "autonomy": {
+    "permissionMode": "acceptEdits",
+    "autoApproveFormatters": true
+  }
+}
+```
+
+### CI/CD Pipeline
+
+```json
+{
+  "autonomy": {
+    "permissionMode": "dontAsk",
+    "sandboxMode": true
+  }
+}
+```
+
+### Exploration/Analysis
+
+```json
+{
+  "autonomy": {
+    "permissionMode": "plan"
+  }
+}
+```
+
+---
+
+## IX. Recovery Procedures
+
+### If Something Goes Wrong
+
+1. **Stop Execution**: Ctrl+C or kill agent
+2. **Review Changes**: `git diff`, `git status`
+3. **Rollback**: `git checkout .` or `git stash`
+4. **Investigate**: Check logs, agent output
+
+### Checkpoints
+
+Enable automatic checkpoints:
+
+```json
+{
+  "multiAgent": {
+    "checkpointIntervalMinutes": 30
+  }
+}
+```
+
+Checkpoints allow:
+- Review progress mid-task
+- Rollback to checkpoint state
+- Resume from checkpoint
+
+---
+
+## X. Configuration Reference
+
+### Full Settings Example
+
+```json
+{
+  "autonomy": {
+    "sandboxMode": false,
+    "permissionMode": "default",
+    "autoApproveReadOnly": true,
+    "autoApproveLinters": true,
+    "autoApproveTests": true,
+    "autoApproveFormatters": true,
+    "requireApprovalFor": [
+      "git commit",
+      "git push",
+      "package install",
+      "file delete",
+      "external API calls"
+    ]
+  },
+
+  "verification": {
+    "enabled": true,
+    "minimalThreshold": 3,
+    "standardThreshold": 10,
+    "alwaysRunSecurity": false,
+    "beforeDone": true,
+    "beforeCommit": true,
+    "beforePR": true
+  },
+
+  "hooks": {
+    "PreToolUse": [...],
+    "PostToolUse": [...],
+    "Stop": [...],
+    "SubagentStop": [...]
+  },
+
+  "subagents": {
+    "defaultModel": "sonnet",
+    "verificationModel": "haiku",
+    "autoVerifyAfterChanges": true,
+    "backgroundVerification": true
+  }
+}
+```
+
+---
+
+## XI. Troubleshooting
+
+### Agent Not Completing
+
+- Check if waiting for approval
+- Review permission mode
+- Check for blockers in hooks
+
+### Too Many Prompts
+
+- Increase auto-approve categories
+- Use `acceptEdits` mode for trusted work
+- Pre-approve via command line
+
+### Safety Concerns
+
+- Use `plan` mode for exploration
+- Enable sandbox mode
+- Reduce allowed scopes
+- Add more PreToolUse hooks
+
+---
+
+## See Also
+
+- Settings template: `.claude/settings.local.json.template`
+- Hook scripts: `.claude/hooks/`
+- Subagent definitions: `.claude/agents/`
+- Verification skill: `.claude/skills/verifier.md`

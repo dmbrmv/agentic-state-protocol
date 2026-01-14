@@ -1,0 +1,228 @@
+# {{PROJECT_NAME}} - Multi-Agent Coordination
+
+**Purpose**: Track parallel agent sessions and delegation history for complex task decomposition.
+**Last Updated**: {{DATE}}
+
+---
+
+## I. Overview
+
+Multi-agent coordination allows breaking complex tasks into subtasks that can be worked on in parallel by spawned Claude agents. This document tracks delegation sessions, agent boundaries, and merge history.
+
+### When to Use Multi-Agent
+
+**Good Candidates for Delegation**:
+- Tasks with independent subtasks (different modules, files)
+- Large refactoring across multiple areas
+- Parallel feature development
+- Test coverage improvement across modules
+
+**Poor Candidates for Delegation**:
+- Sequential tasks with dependencies
+- Tightly coupled code changes
+- Changes to shared state files
+- Tasks requiring frequent coordination
+
+---
+
+## II. Current Delegation Session
+
+**Status**: None active
+
+<!--
+When a delegation session is active, this section will contain:
+
+**Session ID**: DEL-[timestamp]
+**Created**: [ISO timestamp]
+**Parent Task**: [from docs/01_progress.md]
+**Status**: ACTIVE | MERGING | COMPLETE
+
+### Active Agents
+| Agent ID | Subtask | Status | Scope | Progress |
+|----------|---------|--------|-------|----------|
+| AGT-001 | [name] | RUNNING | src/module/* | 50% |
+| AGT-002 | [name] | COMPLETE | src/other/* | 100% |
+
+### Pending Merge
+| Agent | Files Changed | Tests | Review Status |
+|-------|---------------|-------|---------------|
+| AGT-002 | 5 | PASS | Pending |
+
+Use `/sync` to manage this session.
+-->
+
+---
+
+## III. Agent Boundaries
+
+### Global Allowed Scopes
+Agents can be assigned to work within:
+- `src/**` - Source code
+- `tests/**` - Test files
+- `scripts/**` - Utility scripts
+
+### Global Forbidden Scopes
+No agent may modify:
+- `docs/01_progress.md` - Reserved for parent agent
+- `docs/00_MASTER_INDEX.md` - Protocol specification
+- `.claude/**` - Agent configuration
+- `.git/**` - Git internals
+
+### Scope Isolation Rules
+1. Agent scopes should not overlap (prevents conflicts)
+2. If overlap necessary, mark as conflict-prone in delegation plan
+3. Conflicts resolved at merge time with human approval
+
+---
+
+## IV. Delegation Guidelines
+
+### Task Decomposition Principles
+
+1. **Independence**: Subtasks should be as independent as possible
+2. **Bounded Scope**: Each agent should have a clear file/module boundary
+3. **Testability**: Each subtask should be testable in isolation
+4. **Merge Safety**: Consider how changes will merge back
+
+### Recommended Subtask Patterns
+
+**By Module**:
+```
+Subtask 1: Refactor src/auth/* (AGT-001)
+Subtask 2: Refactor src/api/* (AGT-002)
+Subtask 3: Update tests/* (AGT-003)
+```
+
+**By Layer**:
+```
+Subtask 1: Update data models (AGT-001)
+Subtask 2: Update business logic (AGT-002)
+Subtask 3: Update API layer (AGT-003)
+```
+
+**By Feature**:
+```
+Subtask 1: Implement feature A (AGT-001)
+Subtask 2: Implement feature B (AGT-002)
+Subtask 3: Implement feature C (AGT-003)
+```
+
+---
+
+## V. Merge History
+
+<!-- Log of completed delegation sessions. Format:
+
+### Session: DEL-YYYYMMDD-HHMMSS
+
+**Parent Task**: [task name]
+**Duration**: [elapsed time]
+**Outcome**: SUCCESS | PARTIAL | FAILED
+
+**Agents**:
+| Agent | Subtask | Files | Merged |
+|-------|---------|-------|--------|
+| AGT-001 | [name] | 5 | Yes |
+| AGT-002 | [name] | 3 | Yes |
+
+**Conflicts Resolved**: [count or None]
+**Tests After Merge**: PASS
+
+---
+-->
+
+(No completed sessions yet)
+
+---
+
+## VI. Conflict Resolution Log
+
+<!-- When conflicts occur during sync. Format:
+
+### Conflict: YYYY-MM-DD HH:MM
+
+**Session**: DEL-[id]
+**Files**: [list of conflicting files]
+**Agents Involved**: AGT-001, AGT-002
+
+**Conflict Type**: FILE_CONFLICT | IMPORT_CONFLICT | API_CONFLICT
+
+**Resolution**:
+- Approach: [CHOOSE_ONE | MANUAL_MERGE | SEQUENTIAL]
+- Chosen: [which version or how merged]
+- Rationale: [why this resolution]
+
+**Verified**: Tests PASS after resolution
+
+---
+-->
+
+(No conflicts yet)
+
+---
+
+## VII. Agent Performance Metrics
+
+| Metric | Value |
+|--------|-------|
+| Total Delegation Sessions | 0 |
+| Total Agents Spawned | 0 |
+| Successful Merges | 0 |
+| Failed Agents | 0 |
+| Conflicts Resolved | 0 |
+| Average Session Duration | N/A |
+| Average Agents per Session | N/A |
+
+---
+
+## VIII. Best Practices
+
+### Before Delegating
+- [ ] Verify task is suitable for parallelization
+- [ ] Define clear scope boundaries
+- [ ] Check for potential conflicts
+- [ ] Plan merge order if dependencies exist
+
+### During Delegation
+- [ ] Monitor agent progress with `/sync --status`
+- [ ] Address blockers promptly
+- [ ] Review checkpoints as they arrive
+
+### During Merge
+- [ ] Review each agent's changes carefully
+- [ ] Run tests after each merge
+- [ ] Resolve conflicts with human judgment
+- [ ] Document any non-obvious decisions
+
+### After Completion
+- [ ] Update `docs/01_progress.md` with completed work
+- [ ] Log session to `docs/logs/session_context.md`
+- [ ] Archive session in this document
+
+---
+
+## IX. Troubleshooting
+
+### Agent Not Completing
+- Check if scope is too broad
+- Check for blockers in agent output
+- Consider extending timeout or splitting subtask
+
+### Merge Conflicts
+- Review both versions carefully
+- Consider which changes are more recent/complete
+- Test thoroughly after resolution
+
+### Test Failures After Merge
+- Identify which agent's changes caused failure
+- Consider rollback if fix not obvious
+- Run tests incrementally during merge
+
+---
+
+## See Also
+
+- Delegation command: `/delegate`
+- Sync command: `/sync`
+- Parallel coordinator skill: `.claude/skills/parallel_coordinator.md`
+- Delegation registry: `docs/logs/delegation_registry.md`

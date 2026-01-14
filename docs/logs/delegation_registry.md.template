@@ -1,0 +1,142 @@
+# Delegation Registry
+
+**Purpose**: Track active and historical delegation sessions for multi-agent coordination.
+**Managed By**: `/delegate` and `/sync` commands
+
+---
+
+## Active Session
+
+**Status**: None
+
+<!--
+When a delegation session is active:
+
+**Session ID**: DEL-[timestamp]
+**Created**: [ISO timestamp]
+**Parent Task**: [from docs/01_progress.md]
+**Parent Agent**: Main session
+**Status**: ACTIVE | MERGING
+
+### Configuration
+- Max Parallel Agents: 3
+- Agent Timeout: 3600s
+- Human Approval Required: Yes
+- Checkpoint Interval: 30 min
+
+### Agents
+
+#### AGT-001
+- **Subtask**: [description]
+- **Status**: PENDING | SPAWNING | RUNNING | CHECKPOINT | COMPLETE | FAILED
+- **Scope**:
+  - Allowed: [file patterns]
+  - Forbidden: [file patterns]
+- **Spawned**: [timestamp]
+- **Last Activity**: [timestamp]
+- **Checkpoints**: [count]
+- **Files Modified**: [count or list]
+- **Tests**: [PASS | FAIL | NOT_RUN]
+- **Output Summary**: [brief summary when complete]
+
+#### AGT-002
+...
+
+### Pending Merges
+| Agent | Status | Review | Conflicts |
+|-------|--------|--------|-----------|
+| AGT-001 | COMPLETE | Pending | None |
+
+### Session Events
+| Timestamp | Event | Agent | Details |
+|-----------|-------|-------|---------|
+| [time] | SESSION_STARTED | - | Parent task: X |
+| [time] | AGENT_SPAWNED | AGT-001 | Subtask: Y |
+| [time] | CHECKPOINT | AGT-001 | Progress: 50% |
+| [time] | AGENT_COMPLETE | AGT-001 | Files: 5 |
+| [time] | MERGE_APPROVED | AGT-001 | Human approved |
+| [time] | MERGE_COMPLETE | AGT-001 | Tests: PASS |
+
+-->
+
+---
+
+## Archived Sessions
+
+<!--
+Format for archived sessions:
+
+### DEL-20240115-143022
+
+**Status**: COMPLETE
+**Parent Task**: Refactor authentication module
+**Duration**: 2h 15m
+**Agents**: 3 spawned, 3 merged, 0 failed
+
+**Summary**:
+| Agent | Subtask | Files | Tests | Merged |
+|-------|---------|-------|-------|--------|
+| AGT-001 | Auth logic | 5 | PASS | Yes |
+| AGT-002 | Auth API | 3 | PASS | Yes |
+| AGT-003 | Auth tests | 8 | PASS | Yes |
+
+**Conflicts**: None
+**Final Tests**: PASS
+**Notes**: [any relevant notes]
+
+---
+
+### DEL-20240110-091545
+...
+
+-->
+
+(No archived sessions yet)
+
+---
+
+## Session Statistics
+
+| Metric | All Time |
+|--------|----------|
+| Total Sessions | 0 |
+| Completed | 0 |
+| Aborted | 0 |
+| Total Agents | 0 |
+| Merged | 0 |
+| Failed | 0 |
+| Conflicts | 0 |
+
+---
+
+## Quick Reference
+
+### Commands
+- `/delegate` - Start new delegation session
+- `/delegate <task>` - Start with specific task
+- `/sync` - Review and merge agents
+- `/sync --status` - Check status only
+- `/sync --abort` - Cancel session
+
+### Agent States
+```
+PENDING    → Waiting to be spawned
+SPAWNING   → Creation in progress
+RUNNING    → Actively working
+CHECKPOINT → Awaiting review
+COMPLETE   → Finished successfully
+FAILED     → Encountered error
+MERGED     → Integrated into main
+ABORTED    → Cancelled
+```
+
+### Merge Flow
+```
+1. Agent completes subtask
+2. /sync shows in "Ready to Merge"
+3. Human reviews changes
+4. Human approves merge
+5. Changes integrated
+6. Tests run
+7. Agent marked MERGED
+```
