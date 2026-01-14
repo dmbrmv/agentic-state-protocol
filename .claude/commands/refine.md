@@ -2,7 +2,7 @@
 description: "Refine a rough prompt into a clear, actionable request."
 ---
 
-# COMMAND: REFINE PROMPT
+# COMMAND: REFINE
 
 **Trigger**: User types `/refine <rough_prompt>` or "refine: <rough_prompt>"
 

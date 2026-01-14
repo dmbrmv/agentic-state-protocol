@@ -138,6 +138,8 @@ Available skills via `.claude/skills/`:
 | `test_enforcer` | Auto-run tests after code changes, suggest fixes |
 | `parallel_coordinator` | Manage multi-agent delegation with checkpoints |
 | `dependency_tracker` | Track deps, security audit, compatibility check |
+| `verifier` | Ensure work quality through verification levels |
+| `skill_recommender` | Analyze context and recommend skills from registry |
 
 ---
 
@@ -225,6 +227,27 @@ MCP server configurations in `.claude/mcp/`:
 | `test_runners.json` | pytest, jest, cargo test, go test |
 | `linters.json` | ruff, eslint, clippy, golangci-lint |
 | `dependency_auditors.json` | pip-audit, npm audit, cargo audit |
+
+### Test Runners (`test_runners.json`)
+Configures test framework integrations with auto-detection:
+- **pytest** (Python): Coverage support, verbose output, parallel execution
+- **jest/vitest** (JavaScript/TypeScript): Watch mode, coverage reports
+- **cargo test** (Rust): Doc tests, integration tests
+- **go test** (Go): Race detection, benchmarks
+- **make test**: Generic Makefile-based testing
+
+### Linters (`linters.json`)
+Configures linter and formatter integrations:
+- **Python**: ruff (lint + format), pylint, mypy, pyright
+- **JavaScript/TypeScript**: eslint, prettier, tsc
+- **Rust**: clippy, rustfmt
+- **Go**: golangci-lint, gofmt, goimports
+
+### Dependency Auditors (`dependency_auditors.json`)
+Configures security and dependency management:
+- **Security**: pip-audit, safety, npm audit, cargo audit, govulncheck
+- **Outdated**: pip list --outdated, npm outdated, cargo outdated
+- **Licenses**: pip-licenses, license-checker, cargo-license
 
 ---
 
@@ -358,8 +381,8 @@ project/
 │   ├── 03_architecture.md  # System design
 │   ├── 04_standards.md     # Coding standards
 │   ├── 05_guides.md        # Environment guides
-│   ├── 06_multi_agent.md   # Multi-agent overview
-│   ├── 07_autonomous.md    # Autonomous execution guide
+│   ├── 06_multi_agent.md   # Multi-agent overview (see Section IX)
+│   ├── 07_autonomous.md    # Autonomous execution guide (see Section XVI)
 │   └── logs/               # Session memory
 │
 ├── src/                    # Source code
@@ -368,18 +391,18 @@ project/
 ├── configs/                # Configuration files
 │
 └── .claude/                # Claude Code configuration
-    ├── commands/           # CLI commands (17 total)
+    ├── commands/           # CLI commands (18 total)
     │   ├── boot.md, save.md, done.md
-    │   ├── feature.md, refine.md
+    │   ├── feature.md, refine.md, discover.md
     │   ├── test.md, review.md, debug.md, status.md
     │   ├── delegate.md, sync.md
     │   ├── commit-push-pr.md, quickfix.md, precommit.md
     │   ├── investigate.md, verify-background.md, browser-test.md
     │   │
-    ├── skills/             # Auto-enforced behaviors (6 total)
+    ├── skills/             # Auto-enforced behaviors (7 total)
     │   ├── context_manager.md, arch_enforcer.md
     │   ├── test_enforcer.md, parallel_coordinator.md
-    │   ├── dependency_tracker.md, verifier.md
+    │   ├── dependency_tracker.md, verifier.md, skill_recommender.md
     │   │
     ├── agents/             # Specialized subagents (5 total)
     │   ├── code-simplifier.md, verify-app.md

@@ -2,7 +2,7 @@
 description: "Start a new feature with proper planning and architecture alignment."
 ---
 
-# COMMAND: NEW FEATURE
+# COMMAND: FEATURE
 
 **Trigger**: User types `/feature <name>` or "new feature: <description>"
 

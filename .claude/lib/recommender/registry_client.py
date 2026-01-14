@@ -15,6 +15,7 @@ from .models import RegistrySkill, RegistryCache
 
 
 # Fallback list of popular skills for offline operation
+# Last updated: 2026-01-14
 FALLBACK_SKILLS: list[dict[str, Any]] = [
     {
         "identifier": "@anthropics/claude-code-plugins/security-guidance",

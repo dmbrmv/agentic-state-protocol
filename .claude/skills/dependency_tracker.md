@@ -165,7 +165,7 @@ Latest: [latest-version]
 
 Runtime Compatibility:
 - Python version: 3.11 → [COMPATIBLE | INCOMPATIBLE]
-- Node version: 20.x → [COMPATIBLE | INCOMPATIBLE]
+- Node version: 22+ LTS → [COMPATIBLE | INCOMPATIBLE]
 
 Dependency Conflicts:
 - [existing-pkg] requires [dep]<2.0

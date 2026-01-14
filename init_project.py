@@ -11,7 +11,7 @@ Usage:
     python init_project.py --help             # Show help
 
 Requirements:
-    Python 3.8+ (no external dependencies)
+    Python 3.10+ (no external dependencies)
 """
 
 from __future__ import annotations

@@ -2,6 +2,20 @@
 
 A framework for disciplined AI-assisted software development with persistent state, documentation-as-code, and structured workflows.
 
+## Table of Contents
+
+- [The Problem](#the-problem)
+- [The Solution](#the-solution)
+- [Quick Start](#quick-start)
+- [What You Get](#what-you-get)
+- [Core Principles](#core-principles)
+- [Supported Tech Stacks](#supported-tech-stacks)
+- [Architecture Patterns](#architecture-patterns)
+- [Example Workflow](#example-workflow)
+- [Advanced Features](#advanced-features)
+- [Requirements](#requirements)
+- [Contributing](#contributing)
+
 ## The Problem
 
 AI coding assistants suffer from **context amnesia** - each session starts fresh, losing all project knowledge. This leads to:
@@ -166,9 +180,30 @@ PRECOMMIT
 | `.claude/commands/*` | CLI command definitions |
 | `.claude/skills/*` | Auto-enforced behaviors |
 
+## Advanced Features
+
+For advanced usage, see these sections in `docs/00_MASTER_INDEX.md`:
+
+| Feature | Section | Description |
+|---------|---------|-------------|
+| Multi-Agent Coordination | IX | Spawn parallel Claude agents for complex tasks |
+| Inner-Loop Commands | XIV | Fast workflow commands (`/commit-push-pr`, `/quickfix`) |
+| Verification Workflows | XV | Automated quality gates before commits |
+| Autonomous Execution | XVI | Permission modes for supervised autonomy |
+
+### Template Initialization
+
+The `init_project.py` wizard configures:
+1. **Project Name** - Sets the project identifier
+2. **Tech Stack** - Python, JavaScript/TypeScript, Rust, Go, or Other
+3. **Architecture Pattern** - Monolithic, Data Pipeline, or Microservices
+4. **Git Setup** - Optional repository initialization
+
+After initialization, the `docs/` folder contains your project-specific configuration.
+
 ## Requirements
 
-- Python 3.8+ (for init script only)
+- Python 3.10+ (for init script only)
 - Git (optional, for repository initialization)
 - Claude Code or compatible AI assistant
 
