@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Configuration for the skill recommender algorithm",
+  "version": "1.0.0",
+
+  "enabled": true,
+  "cache_ttl_hours": 24,
+  "max_recommendations": 10,
+  "min_score_threshold": 0.5,
+  "auto_fetch_on_boot": false,
+
+  "scoring_weights": {
+    "relevance": 0.30,
+    "quality": 0.20,
+    "need": 0.35,
+    "compatibility": 0.15
+  },
+
+  "preferred_publishers": [
+    "@anthropics",
+    "@wshobson",
+    "@feiskyer",
+    "@davila7"
+  ],
+
+  "excluded_identifiers": [],
+
+  "install_approval": "ask",
+  "track_rejections": true,
+
+  "fallback_registry_url": "https://claude-plugins.dev/api/skills",
+
+  "cli_command": ["npx", "--yes", "claude-plugins"],
+
+  "category_limits": {
+    "skills": 5,
+    "agents": 3,
+    "commands": 3,
+    "hooks": 2
+  }
+}

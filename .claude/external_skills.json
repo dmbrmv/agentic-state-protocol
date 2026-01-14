@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Tracks externally installed skills from claude-plugins.dev registry",
+  "version": "1.0.0",
+
+  "installed": [],
+
+  "rejected": [],
+
+  "cache": {
+    "last_registry_fetch": null,
+    "ttl_hours": 24
+  },
+
+  "settings": {
+    "auto_update_check": false,
+    "notify_on_updates": true
+  }
+}
