@@ -39,16 +39,16 @@ The Agentic State Protocol solves this by treating **documentation as the persis
 
 **One-liner installation:**
 ```bash
-curl -sL https://raw.githubusercontent.com/USER/agentic-state-protocol/main/adopt.sh | bash
+curl -sL https://raw.githubusercontent.com/dmbrmv/agentic-state-protocol/main/adopt.sh | bash
 ```
 
 **Or with options:**
 ```bash
 # Minimal: only .claude/ folder (commands, skills, agents)
-curl -sL https://raw.githubusercontent.com/USER/agentic-state-protocol/main/adopt.sh | bash -s -- --minimal
+curl -sL https://raw.githubusercontent.com/dmbrmv/agentic-state-protocol/main/adopt.sh | bash -s -- --minimal
 
 # Full: includes documentation templates (default)
-curl -sL https://raw.githubusercontent.com/USER/agentic-state-protocol/main/adopt.sh | bash -s -- --full
+curl -sL https://raw.githubusercontent.com/dmbrmv/agentic-state-protocol/main/adopt.sh | bash -s -- --full
 ```
 
 ### Option 2: Manual Installation
@@ -57,7 +57,7 @@ Copy the `.claude/` folder to your existing project:
 
 ```bash
 # Clone temporarily
-git clone --depth 1 https://github.com/USER/agentic-state-protocol.git /tmp/asp
+git clone --depth 1 https://github.com/dmbrmv/agentic-state-protocol.git /tmp/asp
 
 # Copy .claude folder to your project
 cp -r /tmp/asp/.claude /path/to/your/project/
@@ -94,7 +94,7 @@ rm -rf /tmp/asp
 
 **Or clone and initialize:**
 ```bash
-git clone https://github.com/USER/agentic-state-protocol.git my-project
+git clone https://github.com/dmbrmv/agentic-state-protocol.git my-project
 cd my-project
 python init_project.py
 ```

@@ -2,7 +2,7 @@
 # Agentic State Protocol v3.0 - Adoption Script
 #
 # Add the protocol to an existing project with a single command:
-#   curl -sL https://raw.githubusercontent.com/USER/agentic-state-protocol/main/adopt.sh | bash
+#   curl -sL https://raw.githubusercontent.com/dmbrmv/agentic-state-protocol/main/adopt.sh | bash
 #
 # Or run locally:
 #   ./adopt.sh
@@ -22,7 +22,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-REPO_URL="${ASP_REPO_URL:-https://github.com/USER/agentic-state-protocol}"
+REPO_URL="${ASP_REPO_URL:-https://github.com/dmbrmv/agentic-state-protocol}"
 BRANCH="${ASP_BRANCH:-main}"
 MODE="full"
 FORCE=false
