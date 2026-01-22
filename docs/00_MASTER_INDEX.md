@@ -114,6 +114,14 @@ Available commands via `.claude/commands/`:
 | `/debug <issue>` | Structured debugging with root cause analysis |
 | `/status` | Project health dashboard: git, tests, docs, dependencies |
 
+### TDD & Quality Commands
+| Command | Purpose |
+|---------|---------|
+| `/tdd <feature>` | Test-driven development: RED-GREEN-REFACTOR cycle |
+| `/test-coverage` | Coverage analysis with gap identification |
+| `/build-fix` | Diagnose and fix build/type errors |
+| `/learn` | Extract reusable patterns to ~/.claude/skills/learned/ |
+
 ### Multi-Agent Coordination
 | Command | Purpose |
 |---------|---------|
@@ -257,6 +265,9 @@ Specialized agents in `.claude/agents/` for delegated tasks:
 
 | Agent | Purpose | Model |
 |-------|---------|-------|
+| `architect` | System design, ADRs, architecture decisions | opus |
+| `tdd-guide` | TDD methodology enforcement, test-first development | sonnet |
+| `build-error-resolver` | Build/type error resolution with minimal diffs | sonnet |
 | `code-simplifier` | Simplify and clean up code after implementation | sonnet |
 | `verify-app` | End-to-end application verification | sonnet |
 | `security-auditor` | Security-focused code review (read-only) | sonnet |
@@ -266,6 +277,9 @@ Specialized agents in `.claude/agents/` for delegated tasks:
 ### Usage
 
 Subagents are invoked automatically or via commands:
+- `architect`: Use when planning features or making architectural decisions
+- `tdd-guide`: Invoked via `/tdd` for test-first development
+- `build-error-resolver`: Invoked via `/build-fix` for build errors
 - `verify-app`: Auto-triggered before `/done`
 - `security-auditor`: Triggered via `/review --security`
 - `background-verifier`: Triggered via `/verify-background`
@@ -297,9 +311,85 @@ Automated behaviors via `.claude/hooks/`:
 - Evaluate verification agent findings
 - Ensure issues are addressed before proceeding
 
+### PreCompact Hooks
+- Save state before context compaction
+- Update session context with progress
+- Preserve in-progress work information
+
 ---
 
-## XIV. INNER-LOOP COMMANDS
+## XIV. CONTEXT MODES
+
+Dynamic contexts in `.claude/contexts/` for different working modes:
+
+| Context | Mode | Focus |
+|---------|------|-------|
+| `dev.md` | Development | Implementation, coding, TDD |
+| `research.md` | Research | Exploration, investigation (read-only) |
+| `review.md` | Review | Code review, security audit |
+
+### Development Context
+- Write code first, explain after
+- Follow TDD methodology
+- Run tests after changes
+- Keep commits atomic
+
+### Research Context
+- Read widely before concluding
+- Document findings as you go
+- Don't write code until understanding is clear
+- Preserve existing code (exploration only)
+
+### Review Context
+- Prioritize issues by severity
+- Check for security vulnerabilities
+- Suggest fixes, not just problems
+- Verify test coverage
+
+---
+
+## XIV-B. ARCHITECTURE DECISION RECORDS (ADRs)
+
+Significant architectural decisions are documented in `docs/adrs/`:
+
+### ADR Format
+```markdown
+# ADR-XXX: [Title]
+
+## Status
+[Proposed | Accepted | Deprecated | Superseded]
+
+## Context
+[What is motivating this decision?]
+
+## Decision
+[What change are we making?]
+
+## Consequences
+### Positive
+- [Benefits]
+
+### Negative
+- [Drawbacks]
+
+### Alternatives Considered
+- [Why not chosen]
+
+## Date
+YYYY-MM-DD
+```
+
+### When to Create ADRs
+- Choosing frameworks or major libraries
+- Database schema decisions
+- API design choices
+- Authentication/authorization approach
+- Caching strategies
+- Integration patterns
+
+---
+
+## XV. INNER-LOOP COMMANDS
 
 Fast workflow commands with pre-computed context:
 
@@ -383,7 +473,10 @@ project/
 │   ├── 05_guides.md        # Environment guides
 │   ├── 06_multi_agent.md   # Multi-agent overview (see Section IX)
 │   ├── 07_autonomous.md    # Autonomous execution guide (see Section XVI)
-│   └── logs/               # Session memory
+│   ├── logs/               # Session memory
+│   │   └── session_context.md
+│   └── adrs/               # Architecture Decision Records
+│       └── ADR-001-example.md
 │
 ├── src/                    # Source code
 ├── tests/                  # Test suite
@@ -391,27 +484,35 @@ project/
 ├── configs/                # Configuration files
 │
 └── .claude/                # Claude Code configuration
-    ├── commands/           # CLI commands (18 total)
+    ├── commands/           # CLI commands (22 total)
     │   ├── boot.md, save.md, done.md
     │   ├── feature.md, refine.md, discover.md
     │   ├── test.md, review.md, debug.md, status.md
     │   ├── delegate.md, sync.md
     │   ├── commit-push-pr.md, quickfix.md, precommit.md
     │   ├── investigate.md, verify-background.md, browser-test.md
+    │   ├── tdd.md, build-fix.md, test-coverage.md, learn.md  # NEW
     │   │
     ├── skills/             # Auto-enforced behaviors (7 total)
     │   ├── context_manager.md, arch_enforcer.md
     │   ├── test_enforcer.md, parallel_coordinator.md
     │   ├── dependency_tracker.md, verifier.md, skill_recommender.md
     │   │
-    ├── agents/             # Specialized subagents (5 total)
+    ├── agents/             # Specialized subagents (8 total)
+    │   ├── architect.md, tdd-guide.md, build-error-resolver.md  # NEW
     │   ├── code-simplifier.md, verify-app.md
     │   ├── security-auditor.md, background-verifier.md
     │   └── ui-verifier.md
     │   │
-    ├── hooks/              # Automation hooks (4 total)
+    ├── contexts/           # Dynamic context modes (NEW)
+    │   ├── dev.md          # Development mode
+    │   ├── research.md     # Research mode
+    │   └── review.md       # Review mode
+    │   │
+    ├── hooks/              # Automation hooks (5 total)
     │   ├── format-code.sh, markdown-formatter.py
     │   ├── validate-changes.sh, security-check.sh
+    │   └── debug-statement-check.sh  # NEW
     │   │
     ├── mcp/                # MCP configurations
     │   ├── test_runners.json

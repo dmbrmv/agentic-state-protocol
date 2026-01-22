@@ -363,6 +363,27 @@ refactor/extract-validation
 
 ## IV. Testing Standards
 
+### Test-Driven Development (TDD) Mandate
+
+**STRICT MODE**: All new code must follow TDD methodology.
+
+#### The TDD Cycle
+
+```
+RED -> GREEN -> REFACTOR -> REPEAT
+
+1. RED:      Write a failing test FIRST
+2. GREEN:    Write minimal code to pass
+3. REFACTOR: Improve code, keep tests green
+4. REPEAT:   Next feature/scenario
+```
+
+#### TDD Enforcement
+
+- Tests must be written BEFORE implementation
+- Commits are blocked without corresponding tests
+- Coverage gate: 80% minimum, 100% for critical code
+
 ### Test File Naming
 
 | Language | Pattern |
@@ -376,25 +397,57 @@ refactor/extract-validation
 
 ```python
 def test_process_data_returns_valid_result():
-    # Arrange
+    # Arrange - Set up test data
     input_data = {"key": "value"}
     processor = DataProcessor()
 
-    # Act
+    # Act - Execute the code under test
     result = processor.process(input_data)
 
-    # Assert
+    # Assert - Verify the outcome
     assert result.is_valid()
     assert result.key == "value"
 ```
 
 ### Coverage Requirements
 
-| Type | Minimum |
-|------|---------|
-| Unit Tests | 80% |
-| Integration Tests | Critical paths |
-| E2E Tests | Happy paths |
+| Type | Minimum | Notes |
+|------|---------|-------|
+| Unit Tests | 80% | All new code |
+| Integration Tests | Critical paths | APIs, DB operations |
+| E2E Tests | Happy paths | User flows |
+
+#### 100% Coverage Required For:
+- Authentication/Authorization logic
+- Financial calculations
+- Security validation functions
+- Core business logic
+- Data encryption/decryption
+
+### Test Quality Rules
+
+#### DO:
+- Test behavior, not implementation details
+- Write independent tests (no shared state)
+- Use descriptive test names
+- Cover edge cases (null, empty, boundary)
+- Test error paths, not just happy paths
+
+#### DON'T:
+- Test private methods directly
+- Mock everything (prefer integration tests)
+- Skip tests with `.skip` or `.only`
+- Leave debug statements in test files
+- Write tests that depend on other tests
+
+### Edge Cases to Always Test
+
+1. **Null/Undefined** - What if input is null?
+2. **Empty** - What if array/string is empty?
+3. **Invalid Types** - What if wrong type passed?
+4. **Boundaries** - Min/max values (0, -1, MAX_INT)
+5. **Errors** - Network failures, database errors
+6. **Special Characters** - Unicode, SQL injection chars
 
 ---
 

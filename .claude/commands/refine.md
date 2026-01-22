@@ -1,5 +1,5 @@
 ---
-description: "Refine a rough prompt into a clear, actionable request."
+description: "Refine a rough prompt into a clear, actionable request with recommended commands."
 ---
 
 # COMMAND: REFINE
@@ -7,9 +7,10 @@ description: "Refine a rough prompt into a clear, actionable request."
 **Trigger**: User types `/refine <rough_prompt>` or "refine: <rough_prompt>"
 
 ## Purpose
-Takes a rough, vague, or incomplete prompt and transforms it into a clear, specific, actionable request that will produce better results.
+Takes a rough, vague, or incomplete prompt and transforms it into a clear, specific, actionable request that includes recommended `/commands` for the workflow.
 
 ## Actions
+
 1. **Analyze the Rough Prompt**:
    - Identify the core intent (what does user actually want?)
    - Detect ambiguities (multiple interpretations possible?)
@@ -19,6 +20,7 @@ Takes a rough, vague, or incomplete prompt and transforms it into a clear, speci
 2. **Read Relevant Context** (if prompt relates to project):
    - `docs/01_progress.md` (current state - may inform intent)
    - `docs/03_architecture.md` (if code-related)
+   - `.claude/commands/` (available commands for workflow)
 
 3. **Apply Refinement Checklist**:
    - [ ] **WHAT**: Is the desired outcome explicit?
@@ -27,8 +29,27 @@ Takes a rough, vague, or incomplete prompt and transforms it into a clear, speci
    - [ ] **SCOPE**: Are boundaries defined (what NOT to do)?
    - [ ] **OUTPUT**: Is the expected deliverable clear?
    - [ ] **CONSTRAINTS**: Are there limitations to consider?
+   - [ ] **COMMANDS**: Which /commands should be used?
 
-4. **Generate Refined Prompt**:
+4. **Match Intent to Commands**:
+
+   | Intent Keywords | Recommended Commands |
+   |-----------------|---------------------|
+   | implement, build, create, add feature | `/tdd`, `/test` |
+   | fix bug, debug, investigate | `/debug`, `/investigate` |
+   | test, coverage, verify | `/test`, `/test-coverage` |
+   | build error, type error, compile | `/build-fix` |
+   | review, check code, audit | `/review` |
+   | refactor, clean up, simplify | `/review`, `/test` |
+   | deploy, release, commit | `/precommit`, `/commit-push-pr` |
+   | status, health, overview | `/status` |
+   | document, explain | `/review` |
+   | parallel, delegate, split | `/delegate`, `/sync` |
+   | start session, begin | `/boot` |
+   | finish, complete, done | `/done`, `/save` |
+   | learn, extract, pattern | `/learn` |
+
+5. **Generate Refined Prompt**:
    ```
    REFINED PROMPT
 
@@ -42,38 +63,118 @@ Takes a rough, vague, or incomplete prompt and transforms it into a clear, speci
    - <assumptions made explicit>
    - <scope boundaries added>
 
+   Recommended Workflow:
+   1. <command 1> - <why>
+   2. <command 2> - <why>
+   3. <command 3> - <why>
+
    Questions (if still ambiguous):
    - <question 1>?
    - <question 2>?
    ```
 
-5. **Ask User**:
-   - "Use this refined prompt? Or adjust something?"
+6. **Ask User**:
+   - "Use this refined prompt with the suggested workflow? Or adjust something?"
    - If user approves: Execute the refined prompt
    - If user has questions: Answer and re-refine
 
-## Refinement Patterns
+## Available Commands Reference
 
-### Vague Intent -> Specific Action
-- "fix the bug" -> "Fix the TypeError in `src/module.py:142` where `None` is passed to the function"
-- "make it faster" -> "Optimize the `process_data()` function by adding caching for repeated lookups"
+### Session Management
+| Command | Use For |
+|---------|---------|
+| `/boot` | Start session, load context |
+| `/save` | End session, checkpoint state |
+| `/done` | Mark task complete |
+| `/status` | Project health overview |
 
-### Missing Context -> With Context
-- "add logging" -> "Add structured logging using the existing logger module, at INFO level for API calls and DEBUG for data transformations"
+### Development
+| Command | Use For |
+|---------|---------|
+| `/feature <name>` | Plan new feature |
+| `/tdd <feature>` | Test-driven implementation |
+| `/test` | Run tests with analysis |
+| `/test-coverage` | Coverage gaps analysis |
+| `/build-fix` | Fix build/type errors |
+| `/quickfix` | Auto-fix lint issues |
+| `/precommit` | Pre-commit validation |
 
-### Unbounded Scope -> Bounded Scope
-- "refactor the code" -> "Refactor `src/utils.py` to extract the validation logic into a separate `Validator` class, without changing the public API"
+### Quality & Review
+| Command | Use For |
+|---------|---------|
+| `/review` | Code review |
+| `/debug <issue>` | Structured debugging |
+| `/investigate <topic>` | Deep investigation |
+| `/learn` | Extract reusable patterns |
 
-### Unclear Output -> Explicit Deliverable
-- "document this" -> "Add docstrings to all public functions in `src/api.py` following Google style, including Args, Returns, and Examples sections"
+### Collaboration
+| Command | Use For |
+|---------|---------|
+| `/delegate <task>` | Spawn parallel agents |
+| `/sync` | Merge parallel work |
+| `/commit-push-pr` | Quick commit and PR |
+
+## Refinement Examples
+
+### Example 1: Feature Implementation
+**Original**: "add user authentication"
+
+**Refined**:
+"Implement user authentication with JWT tokens for the API.
+- Add login/logout endpoints
+- Create auth middleware
+- Store tokens securely
+- Follow existing API patterns in `src/api/`"
+
+**Recommended Workflow**:
+1. `/feature auth` - Plan the authentication architecture
+2. `/tdd auth-endpoints` - Implement with TDD
+3. `/test-coverage` - Verify 100% coverage (auth is critical)
+4. `/review` - Security review before merge
+5. `/done` - Complete task
+
+### Example 2: Bug Fix
+**Original**: "fix the login bug"
+
+**Refined**:
+"Fix the login failure where users get 401 error after valid credentials.
+- Investigate token generation in `src/auth/token.ts`
+- Check session handling
+- Add regression test"
+
+**Recommended Workflow**:
+1. `/debug login-401` - Structured debugging
+2. `/tdd login-fix` - Write failing test first
+3. `/test` - Verify fix doesn't break other tests
+4. `/learn` - Extract pattern if non-obvious fix
+5. `/done` - Complete task
+
+### Example 3: Code Quality
+**Original**: "clean up the code"
+
+**Refined**:
+"Refactor `src/utils/` to reduce complexity.
+- Extract repeated patterns
+- Improve naming
+- Add missing type annotations
+- Maintain existing behavior (no functional changes)"
+
+**Recommended Workflow**:
+1. `/test` - Ensure tests pass before refactoring
+2. `/review` - Identify specific improvements needed
+3. `/test` - Run tests after each change
+4. `/test-coverage` - Verify coverage maintained
+5. `/done` - Complete task
 
 ## Safety Rails
 - NEVER execute the original vague prompt directly
-- ALWAYS present refined version for approval
-- If prompt is already clear: Say "This prompt is already well-structured. Proceed?"
+- ALWAYS present refined version with commands for approval
+- If prompt is already clear: Say "This prompt is already well-structured. Proceed with these commands: [list]?"
 - If prompt is dangerous/out of scope: Refuse and explain why
+- If no commands match: Proceed without command suggestions
 
 ## See Also
 - Coding standards: `docs/04_standards.md`
 - Architecture: `docs/03_architecture.md`
 - Progress tracker: `docs/01_progress.md`
+- All commands: `.claude/commands/`

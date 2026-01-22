@@ -218,12 +218,17 @@ def create_directory_structure(target_dir: Path, project_slug: str) -> None:
     directories = [
         "docs/logs",
         "docs/reference",
+        "docs/adrs",
         f"src/{project_slug}",
         "tests",
         "scripts",
         "configs",
         ".claude/commands",
         ".claude/skills",
+        ".claude/agents",
+        ".claude/contexts",
+        ".claude/hooks",
+        ".claude/mcp",
     ]
 
     for dir_path in directories:
@@ -232,6 +237,9 @@ def create_directory_structure(target_dir: Path, project_slug: str) -> None:
     # Create __init__.py files
     (target_dir / f"src/{project_slug}/__init__.py").touch()
     (target_dir / "tests/__init__.py").touch()
+
+    # Create .gitkeep for empty directories
+    (target_dir / "docs/adrs/.gitkeep").touch()
 
     print(f"  Created directory structure")
 

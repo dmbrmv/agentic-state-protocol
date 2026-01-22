@@ -35,8 +35,55 @@ The Agentic State Protocol solves this by treating **documentation as the persis
 
 ## Quick Start
 
-### Option 1: Use as GitHub Template
+### Option 1: Add to Existing Project (Recommended)
 
+**One-liner installation:**
+```bash
+curl -sL https://raw.githubusercontent.com/USER/agentic-state-protocol/main/adopt.sh | bash
+```
+
+**Or with options:**
+```bash
+# Minimal: only .claude/ folder (commands, skills, agents)
+curl -sL https://raw.githubusercontent.com/USER/agentic-state-protocol/main/adopt.sh | bash -s -- --minimal
+
+# Full: includes documentation templates (default)
+curl -sL https://raw.githubusercontent.com/USER/agentic-state-protocol/main/adopt.sh | bash -s -- --full
+```
+
+### Option 2: Manual Installation
+
+Copy the `.claude/` folder to your existing project:
+
+```bash
+# Clone temporarily
+git clone --depth 1 https://github.com/USER/agentic-state-protocol.git /tmp/asp
+
+# Copy .claude folder to your project
+cp -r /tmp/asp/.claude /path/to/your/project/
+
+# (Optional) Copy documentation templates
+cp -r /tmp/asp/docs /path/to/your/project/
+cp /tmp/asp/CLAUDE.md.template /path/to/your/project/
+
+# Clean up
+rm -rf /tmp/asp
+```
+
+**What you get:**
+```
+.claude/
+├── commands/      # 22 CLI commands (/boot, /tdd, /review, etc.)
+├── skills/        # 7 auto-enforced behaviors
+├── agents/        # 8 specialized subagents
+├── contexts/      # 3 working modes (dev, research, review)
+├── hooks/         # 5 automation hooks
+└── mcp/           # MCP server configurations
+```
+
+### Option 3: New Project from Template
+
+**Use as GitHub Template:**
 1. Click "Use this template" on GitHub
 2. Clone your new repository
 3. Run the setup wizard:
@@ -45,44 +92,95 @@ The Agentic State Protocol solves this by treating **documentation as the persis
    ```
 4. Follow the interactive prompts
 
-### Option 2: Clone and Initialize
+**Or clone and initialize:**
+```bash
+git clone https://github.com/USER/agentic-state-protocol.git my-project
+cd my-project
+python init_project.py
+```
+
+### After Installation
 
 ```bash
-# Clone the template
-git clone https://github.com/yourusername/agentic-state-protocol.git my-project
-cd my-project
-
-# Run the setup wizard
-python init_project.py
-
 # Start your first session
 /boot
+
+# Check project status
+/status
+
+# See all available commands
+# (listed in docs/00_MASTER_INDEX.md)
 ```
 
 ## What You Get
 
-### Documentation Structure
+### The `.claude/` Folder (Core)
+
+This is the heart of the protocol - works immediately after copying:
+
+```
+.claude/
+├── commands/           # 22 CLI commands
+│   ├── boot.md         # /boot - Start session
+│   ├── save.md         # /save - End session
+│   ├── done.md         # /done - Complete task
+│   ├── tdd.md          # /tdd - Test-driven development
+│   ├── test.md         # /test - Run tests
+│   ├── review.md       # /review - Code review
+│   ├── build-fix.md    # /build-fix - Fix build errors
+│   ├── learn.md        # /learn - Extract patterns
+│   └── ...             # 14 more commands
+│
+├── skills/             # Auto-enforced behaviors
+├── agents/             # Specialized subagents
+├── contexts/           # Working modes (dev/research/review)
+├── hooks/              # Automation (format, lint, security)
+└── mcp/                # MCP server configs
+```
+
+### Documentation Structure (Optional)
+
+If you use `--full` mode or want state persistence:
+
 ```
 docs/
-├── 00_MASTER_INDEX.md      # Protocol specification
+├── 00_MASTER_INDEX.md      # Protocol specification (start here)
 ├── 01_progress.md          # Tasks, backlog, metrics
 ├── 02_issues.md            # Issue registry
 ├── 03_architecture.md      # System design
 ├── 04_standards.md         # Coding standards
 ├── 05_guides.md            # Environment setup
+├── adrs/                   # Architecture Decision Records
 └── logs/
     └── session_context.md  # Session history
 ```
 
 ### CLI Commands
 
+**Session Management:**
 | Command | Purpose |
 |---------|---------|
 | `/boot` | Start session: load state, show active task |
 | `/save` | End session: update docs, prepare commit |
 | `/done` | Mark task complete, suggest next |
+| `/status` | Project health dashboard |
+
+**Development:**
+| Command | Purpose |
+|---------|---------|
+| `/tdd <feature>` | Test-driven development workflow |
+| `/test` | Run tests with failure analysis |
+| `/test-coverage` | Coverage analysis with gap identification |
+| `/build-fix` | Fix build/type errors |
 | `/feature <name>` | Plan new feature before coding |
-| `/refine <prompt>` | Clarify vague requests |
+
+**Quality:**
+| Command | Purpose |
+|---------|---------|
+| `/review` | Code review with security checks |
+| `/refine <prompt>` | Clarify vague requests with command suggestions |
+| `/learn` | Extract reusable patterns |
+| `/precommit` | Run all pre-commit checks |
 
 ### Skills (Auto-Enforced)
 
@@ -90,6 +188,8 @@ docs/
 |-------|---------|
 | `context_manager` | Keep docs synchronized with code |
 | `arch_enforcer` | Enforce architecture and standards |
+| `test_enforcer` | Auto-run tests, enforce coverage |
+| `verifier` | Quality gates before commits |
 
 ## Core Principles
 
@@ -170,15 +270,56 @@ PRECOMMIT
 4. **Reproducible** - Same workflow for every task
 5. **Portable** - Works across any project, any tech stack
 
+## Customization After Adoption
+
+### If You Have an Existing CLAUDE.md
+
+Merge the protocol instructions into your existing file:
+
+```markdown
+# Your Project Name
+
+## Project-Specific Instructions
+[Your existing content]
+
+## Agentic State Protocol
+[Copy relevant sections from CLAUDE.md.template]
+
+### Mandatory Loop
+1. STATE CHECK → Read docs/01_progress.md
+2. ALIGN → Verify active task
+3. EXECUTE → Perform the work
+4. COMMIT → Update documentation
+```
+
+### Minimal Setup (Just Commands)
+
+If you only want the `/commands` without full state management:
+
+1. Copy only `.claude/commands/` and `.claude/contexts/`
+2. Skip the `docs/` folder entirely
+3. Commands like `/tdd`, `/test`, `/review` work standalone
+
+### Full Setup (Recommended for Teams)
+
+1. Copy everything with `--full` flag
+2. Rename `*.template` files and fill in project details
+3. Commit the `docs/` folder to git
+4. Team members get persistent context across sessions
+
 ## Files Overview
 
 | File | Purpose |
 |------|---------|
-| `init_project.py` | Setup wizard (run once) |
+| `adopt.sh` | One-liner adoption script |
+| `init_project.py` | Interactive wizard (new projects) |
 | `CLAUDE.md.template` | Agent instructions template |
 | `docs/*.template` | Documentation templates |
 | `.claude/commands/*` | CLI command definitions |
 | `.claude/skills/*` | Auto-enforced behaviors |
+| `.claude/agents/*` | Specialized subagents |
+| `.claude/contexts/*` | Working mode definitions |
+| `.claude/hooks/*` | Automation scripts |
 
 ## Advanced Features
 
