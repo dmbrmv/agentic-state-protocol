@@ -21,7 +21,7 @@ Security gate that prevents modifications to sensitive files and blocks dangerou
 | `id_rsa`, `id_ed25519`, `id_ecdsa` | SSH private keys |
 | `.aws/credentials` | AWS credentials file |
 | `.ssh/config` | SSH configuration |
-| `.netrc`, `.npmrc`, `.pypirc` | Package manager auth files |
+| `.netrc`, `.pypirc` | Package manager auth files |
 | `.docker/config` | Docker credentials |
 | `password`, `api_key`, `auth_token` | Generic sensitive patterns |
 
@@ -31,9 +31,8 @@ Security gate that prevents modifications to sensitive files and blocks dangerou
 |------|--------|
 | `/etc/`, `/usr/`, `/var/`, `/bin/`, `/sbin/` | System directories |
 | `/root/` | Root user directory |
-| `node_modules/`, `__pycache__/` | Dependency caches |
+| `__pycache__/` | Python bytecode cache |
 | `.venv/`, `venv/` | Virtual environments |
-| `target/debug/`, `target/release/` | Rust build artifacts |
 | `.git/` | Git internal directory |
 
 ## Command Protection
@@ -55,7 +54,8 @@ Security gate that prevents modifications to sensitive files and blocks dangerou
 | Pattern | Note |
 |---------|------|
 | `sudo` commands | Elevated privileges warning |
-| `pip install`, `npm install`, etc. | Package installation info |
+| `pip install`, `conda install` | Package installation info |
+| `pickle.load`, untrusted data files | Deserialization risks (scientific Python) |
 
 ## Configuration
 

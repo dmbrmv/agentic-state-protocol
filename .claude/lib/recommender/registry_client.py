@@ -23,18 +23,7 @@ FALLBACK_SKILLS: list[dict[str, Any]] = [
         "description": "Security-focused code review and guidance",
         "category": "skills",
         "tags": ["security", "audit", "review", "vulnerability"],
-        "supported_languages": ["python", "javascript", "typescript", "go", "rust"],
-        "stars": 55900,
-        "installs": 595,
-        "verified": True,
-    },
-    {
-        "identifier": "@anthropics/claude-code-plugins/frontend-design",
-        "name": "Frontend Design",
-        "description": "UI/UX design patterns and component architecture",
-        "category": "skills",
-        "tags": ["frontend", "ui", "design", "react", "components"],
-        "supported_languages": ["javascript", "typescript"],
+        "supported_languages": ["python"],
         "stars": 55900,
         "installs": 595,
         "verified": True,
@@ -56,7 +45,7 @@ FALLBACK_SKILLS: list[dict[str, Any]] = [
         "description": "Backend API design, databases, and architecture",
         "category": "skills",
         "tags": ["backend", "api", "database", "architecture"],
-        "supported_languages": ["python", "javascript", "typescript", "go"],
+        "supported_languages": ["python"],
         "stars": 25200,
         "installs": 728,
         "verified": False,
@@ -67,7 +56,7 @@ FALLBACK_SKILLS: list[dict[str, Any]] = [
         "description": "Documentation generation and maintenance",
         "category": "skills",
         "tags": ["docs", "documentation", "api", "readme", "comments"],
-        "supported_languages": ["python", "javascript", "typescript", "rust", "go"],
+        "supported_languages": ["python"],
         "stars": 25200,
         "installs": 500,
         "verified": False,
@@ -78,7 +67,7 @@ FALLBACK_SKILLS: list[dict[str, Any]] = [
         "description": "Code refactoring patterns and techniques",
         "category": "skills",
         "tags": ["refactor", "clean", "patterns", "architecture"],
-        "supported_languages": ["python", "javascript", "typescript", "go", "rust"],
+        "supported_languages": ["python"],
         "stars": 12000,
         "installs": 450,
         "verified": False,
@@ -89,7 +78,7 @@ FALLBACK_SKILLS: list[dict[str, Any]] = [
         "description": "Automatic test generation and coverage improvement",
         "category": "agents",
         "tags": ["test", "testing", "coverage", "unit", "integration"],
-        "supported_languages": ["python", "javascript", "typescript"],
+        "supported_languages": ["python"],
         "stars": 8500,
         "installs": 320,
         "verified": False,
@@ -100,7 +89,7 @@ FALLBACK_SKILLS: list[dict[str, Any]] = [
         "description": "Automated pull request review agent",
         "category": "agents",
         "tags": ["pr", "review", "github", "code-review"],
-        "supported_languages": ["python", "javascript", "typescript", "go", "rust"],
+        "supported_languages": ["python"],
         "stars": 8500,
         "installs": 280,
         "verified": False,
@@ -209,7 +198,7 @@ class RegistryClient:
         except subprocess.TimeoutExpired:
             pass
         except FileNotFoundError:
-            # npx not available
+            # CLI tool not available
             pass
         except json.JSONDecodeError:
             pass
@@ -370,7 +359,7 @@ class RegistryClient:
         except subprocess.TimeoutExpired:
             return False, "Installation timed out"
         except FileNotFoundError:
-            return False, "npx not found. Please install Node.js"
+            return False, "CLI tool not found. Please install claude-plugins"
         except Exception as e:
             return False, f"Installation error: {str(e)}"
 

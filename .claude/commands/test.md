@@ -13,10 +13,8 @@ Execute project tests, analyze failures with AI, and suggest actionable fixes. I
 
 1. **Detect Test Framework**:
    - Scan for: `pytest.ini`, `pyproject.toml [tool.pytest]`, `conftest.py` (Python)
-   - Scan for: `jest.config.*`, `package.json:jest`, `vitest.config.*` (JavaScript/TypeScript)
-   - Scan for: `Cargo.toml` (Rust)
-   - Scan for: `go.mod`, `*_test.go` (Go)
-   - Select appropriate runner: pytest | jest | vitest | cargo test | go test
+   - Scan for: `unittest` test files matching `test_*.py` (Python stdlib)
+   - Select appropriate runner: pytest | unittest
 
 2. **Read Test Context**:
    - `docs/01_progress.md` (active task context)
@@ -25,10 +23,8 @@ Execute project tests, analyze failures with AI, and suggest actionable fixes. I
 3. **Run Tests**:
    ```bash
    # Based on detected framework:
-   pytest {scope} -v --tb=short          # Python
-   npx jest {scope} --verbose            # JavaScript
-   cargo test {scope} -- --nocapture     # Rust
-   go test {scope} -v                    # Go
+   pytest {scope} -v --tb=short          # Python (pytest)
+   python -m unittest {scope}            # Python (unittest)
    ```
 
 4. **Output Results**:
@@ -133,10 +129,8 @@ If test framework not detected:
 TEST FRAMEWORK NOT DETECTED
 
 Searched for:
-- pytest.ini, pyproject.toml [tool.pytest] (Python)
-- jest.config.*, package.json (JavaScript)
-- Cargo.toml (Rust)
-- go.mod (Go)
+- pytest.ini, pyproject.toml [tool.pytest], conftest.py (Python/pytest)
+- test_*.py files (Python/unittest)
 
 Please specify the test command:
 > /test --command "your test command"

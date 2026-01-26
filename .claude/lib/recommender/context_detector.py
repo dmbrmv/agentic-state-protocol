@@ -4,7 +4,6 @@ Project context detection module.
 Analyzes project structure, tech stack, and existing protocol elements.
 """
 
-import json
 import re
 from pathlib import Path
 from typing import Any
@@ -18,40 +17,16 @@ MANIFEST_LANGUAGES: dict[str, str] = {
     "requirements.txt": "python",
     "setup.py": "python",
     "Pipfile": "python",
-    "package.json": "javascript",
-    "tsconfig.json": "typescript",
-    "Cargo.toml": "rust",
-    "go.mod": "go",
-    "pom.xml": "java",
-    "build.gradle": "java",
-    "build.gradle.kts": "kotlin",
-    "Gemfile": "ruby",
-    "composer.json": "php",
-    "mix.exs": "elixir",
-    "pubspec.yaml": "dart",
+    "environment.yml": "python",
+    "conda.yml": "python",
 }
 
 # File extensions mapped to languages
 EXTENSION_LANGUAGES: dict[str, str] = {
     ".py": "python",
     ".pyx": "python",
-    ".js": "javascript",
-    ".jsx": "javascript",
-    ".ts": "typescript",
-    ".tsx": "typescript",
-    ".rs": "rust",
-    ".go": "go",
-    ".java": "java",
-    ".kt": "kotlin",
-    ".rb": "ruby",
-    ".php": "php",
-    ".ex": "elixir",
-    ".exs": "elixir",
-    ".dart": "dart",
-    ".cs": "csharp",
-    ".cpp": "cpp",
-    ".c": "c",
-    ".swift": "swift",
+    ".pyi": "python",
+    ".ipynb": "python",
 }
 
 # Framework detection patterns
@@ -67,27 +42,12 @@ FRAMEWORK_PATTERNS: dict[str, dict[str, Any]] = {
         "pandas": {"deps": ["pandas"], "files": []},
         "torch": {"deps": ["torch", "pytorch"], "files": []},
         "tensorflow": {"deps": ["tensorflow"], "files": []},
-    },
-    "javascript": {
-        "react": {"deps": ["react"], "files": []},
-        "next": {"deps": ["next"], "files": ["next.config.js", "next.config.mjs"]},
-        "vue": {"deps": ["vue"], "files": ["vue.config.js"]},
-        "svelte": {"deps": ["svelte"], "files": ["svelte.config.js"]},
-        "express": {"deps": ["express"], "files": []},
-        "nest": {"deps": ["@nestjs/core"], "files": ["nest-cli.json"]},
-        "jest": {"deps": ["jest"], "files": ["jest.config.js", "jest.config.ts"]},
-        "vitest": {"deps": ["vitest"], "files": ["vitest.config.ts"]},
-    },
-    "rust": {
-        "tokio": {"deps": ["tokio"], "files": []},
-        "actix": {"deps": ["actix-web"], "files": []},
-        "axum": {"deps": ["axum"], "files": []},
-        "serde": {"deps": ["serde"], "files": []},
-    },
-    "go": {
-        "gin": {"deps": ["github.com/gin-gonic/gin"], "files": []},
-        "echo": {"deps": ["github.com/labstack/echo"], "files": []},
-        "fiber": {"deps": ["github.com/gofiber/fiber"], "files": []},
+        "xarray": {"deps": ["xarray"], "files": []},
+        "rasterio": {"deps": ["rasterio"], "files": []},
+        "geopandas": {"deps": ["geopandas"], "files": []},
+        "scipy": {"deps": ["scipy"], "files": []},
+        "scikit-learn": {"deps": ["scikit-learn", "sklearn"], "files": []},
+        "marimo": {"deps": ["marimo"], "files": []},
     },
 }
 
@@ -97,12 +57,8 @@ PACKAGE_MANAGERS: dict[str, str] = {
     "requirements.txt": "pip",
     "Pipfile": "pipenv",
     "poetry.lock": "poetry",
-    "package.json": "npm",
-    "yarn.lock": "yarn",
-    "pnpm-lock.yaml": "pnpm",
-    "bun.lockb": "bun",
-    "Cargo.toml": "cargo",
-    "go.mod": "go",
+    "environment.yml": "conda",
+    "conda.yml": "conda",
 }
 
 # CI/CD config files
@@ -226,12 +182,6 @@ def _detect_frameworks(project_path: Path, language: str) -> list[str]:
     deps = set()
     if language == "python":
         deps = _get_python_deps(project_path)
-    elif language in ("javascript", "typescript"):
-        deps = _get_js_deps(project_path)
-    elif language == "rust":
-        deps = _get_rust_deps(project_path)
-    elif language == "go":
-        deps = _get_go_deps(project_path)
 
     for framework, pattern in patterns.items():
         # Check dependencies
@@ -289,60 +239,6 @@ def _get_python_deps(project_path: Path) -> set[str]:
     return deps
 
 
-def _get_js_deps(project_path: Path) -> set[str]:
-    """Extract JavaScript/TypeScript dependencies."""
-    deps = set()
-    package_json = project_path / "package.json"
-
-    if package_json.exists():
-        try:
-            data = json.loads(package_json.read_text())
-            deps.update(data.get("dependencies", {}).keys())
-            deps.update(data.get("devDependencies", {}).keys())
-        except Exception:
-            pass
-
-    return deps
-
-
-def _get_rust_deps(project_path: Path) -> set[str]:
-    """Extract Rust dependencies."""
-    deps = set()
-    cargo_toml = project_path / "Cargo.toml"
-
-    if cargo_toml.exists():
-        try:
-            import tomllib
-            with open(cargo_toml, "rb") as f:
-                data = tomllib.load(f)
-            deps.update(data.get("dependencies", {}).keys())
-            deps.update(data.get("dev-dependencies", {}).keys())
-        except Exception:
-            pass
-
-    return deps
-
-
-def _get_go_deps(project_path: Path) -> set[str]:
-    """Extract Go dependencies."""
-    deps = set()
-    go_mod = project_path / "go.mod"
-
-    if go_mod.exists():
-        try:
-            content = go_mod.read_text()
-            for line in content.splitlines():
-                if line.strip().startswith("require"):
-                    continue
-                match = re.match(r"^\s*([^\s]+)", line)
-                if match:
-                    deps.add(match.group(1))
-        except Exception:
-            pass
-
-    return deps
-
-
 def _parse_dependencies(
     project_path: Path, package_manager: str
 ) -> tuple[list[str], list[str]]:
@@ -350,31 +246,31 @@ def _parse_dependencies(
     deps = []
     dev_deps = []
 
-    if package_manager in ("pip", "poetry", "pipenv"):
+    if package_manager in ("pip", "poetry", "pipenv", "conda"):
         all_deps = _get_python_deps(project_path)
         deps = list(all_deps)
 
-    elif package_manager in ("npm", "yarn", "pnpm", "bun"):
-        package_json = project_path / "package.json"
-        if package_json.exists():
-            try:
-                data = json.loads(package_json.read_text())
-                deps = list(data.get("dependencies", {}).keys())
-                dev_deps = list(data.get("devDependencies", {}).keys())
-            except Exception:
-                pass
-
-    elif package_manager == "cargo":
-        cargo_toml = project_path / "Cargo.toml"
-        if cargo_toml.exists():
-            try:
-                import tomllib
-                with open(cargo_toml, "rb") as f:
-                    data = tomllib.load(f)
-                deps = list(data.get("dependencies", {}).keys())
-                dev_deps = list(data.get("dev-dependencies", {}).keys())
-            except Exception:
-                pass
+        # Also check conda environment.yml for dependencies
+        if package_manager == "conda":
+            env_yml = project_path / "environment.yml"
+            if env_yml.exists():
+                try:
+                    content = env_yml.read_text()
+                    # Simple extraction of conda deps from environment.yml
+                    in_deps = False
+                    for line in content.splitlines():
+                        stripped = line.strip()
+                        if stripped == "dependencies:":
+                            in_deps = True
+                            continue
+                        if in_deps and stripped.startswith("- "):
+                            dep_name = stripped[2:].split("=")[0].split(">")[0].split("<")[0].strip()
+                            if dep_name and not dep_name.startswith("pip:"):
+                                deps.append(dep_name.lower())
+                        elif in_deps and not stripped.startswith("-") and not stripped.startswith("#"):
+                            in_deps = False
+                except Exception:
+                    pass
 
     return deps, dev_deps
 
@@ -384,15 +280,13 @@ def _has_tests(project_path: Path) -> bool:
     test_indicators = [
         project_path / "tests",
         project_path / "test",
-        project_path / "__tests__",
-        project_path / "spec",
     ]
 
     if any(d.is_dir() for d in test_indicators):
         return True
 
     # Check for test files
-    test_patterns = ["*_test.py", "test_*.py", "*.test.js", "*.test.ts", "*.spec.js"]
+    test_patterns = ["*_test.py", "test_*.py"]
     for pattern in test_patterns:
         if list(project_path.rglob(pattern)):
             return True
@@ -415,11 +309,11 @@ def _infer_project_type(project_path: Path, context: ProjectContext) -> str:
     for indicator in cli_indicators:
         if (project_path / indicator).exists():
             # But also check if it's not a web app
-            if not any(fw in context.frameworks for fw in ["fastapi", "django", "flask", "express", "next"]):
+            if not any(fw in context.frameworks for fw in ["fastapi", "django", "flask"]):
                 return "cli"
 
     # Check for web app indicators
-    web_frameworks = ["fastapi", "django", "flask", "express", "next", "react", "vue"]
+    web_frameworks = ["fastapi", "django", "flask"]
     if any(fw in context.frameworks for fw in web_frameworks):
         return "webapp"
 
@@ -570,12 +464,8 @@ def _parse_current_goal(path: Path) -> str:
 def _has_linter(project_path: Path) -> bool:
     """Check if linter is configured."""
     linter_configs = [
-        ".eslintrc", ".eslintrc.js", ".eslintrc.json",
         "ruff.toml", ".ruff.toml",
         ".flake8", ".pylintrc",
-        "biome.json",
-        ".golangci.yml",
-        "clippy.toml",
     ]
 
     for config in linter_configs:
@@ -612,9 +502,5 @@ def _has_type_checking(project_path: Path, language: str) -> bool:
                     return True
             except Exception:
                 pass
-
-    elif language in ("javascript", "typescript"):
-        if (project_path / "tsconfig.json").exists():
-            return True
 
     return False

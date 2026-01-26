@@ -34,32 +34,6 @@ case "$EXT" in
         fi
         ;;
 
-    # JavaScript/TypeScript/JSON/Markdown/YAML
-    js|jsx|ts|tsx|json|md|mdx|yaml|yml|css|scss|html)
-        if command -v prettier &> /dev/null; then
-            prettier --write "$FILE_PATH" 2>/dev/null || true
-        elif command -v npx &> /dev/null; then
-            npx prettier --write "$FILE_PATH" 2>/dev/null || true
-        fi
-        ;;
-
-    # Rust files
-    rs)
-        if command -v rustfmt &> /dev/null; then
-            rustfmt "$FILE_PATH" 2>/dev/null || true
-        fi
-        ;;
-
-    # Go files
-    go)
-        if command -v gofmt &> /dev/null; then
-            gofmt -w "$FILE_PATH" 2>/dev/null || true
-        fi
-        if command -v goimports &> /dev/null; then
-            goimports -w "$FILE_PATH" 2>/dev/null || true
-        fi
-        ;;
-
     # Shell scripts
     sh|bash)
         if command -v shfmt &> /dev/null; then
@@ -71,6 +45,15 @@ case "$EXT" in
     toml)
         if command -v taplo &> /dev/null; then
             taplo format "$FILE_PATH" 2>/dev/null || true
+        fi
+        ;;
+
+    # Config and documentation files (JSON, YAML, Markdown)
+    json|yaml|yml|md)
+        if command -v prettier &> /dev/null; then
+            prettier --write "$FILE_PATH" 2>/dev/null || true
+        elif command -v npx &> /dev/null; then
+            npx prettier --write "$FILE_PATH" 2>/dev/null || true
         fi
         ;;
 esac

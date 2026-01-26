@@ -41,7 +41,7 @@ Systematic debugging workflow that gathers context, performs root cause analysis
       - [Tracing imports and dependencies...]
 
    4. Environment Check
-      - Python/Node version: [version]
+      - Python version: [version]
       - Key dependencies: [versions]
       - Config files: [relevant configs]
 

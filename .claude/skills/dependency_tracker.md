@@ -9,7 +9,7 @@
 Use this skill when:
 1. User runs `/status` command (show dependency status)
 2. Before adding new dependencies
-3. After modifying dependency files (requirements.txt, package.json, etc.)
+3. After modifying dependency files (pyproject.toml, requirements.txt, environment.yml)
 4. Periodically during long sessions
 5. User asks about dependency issues
 6. Before `/save` checkpoint (quick security check)
@@ -24,19 +24,18 @@ Use this skill when:
 
 | Language | Primary Files | Lock Files |
 |----------|--------------|------------|
-| Python | requirements.txt, pyproject.toml, setup.py, Pipfile | Pipfile.lock, poetry.lock |
-| JavaScript | package.json | package-lock.json, yarn.lock, pnpm-lock.yaml |
-| Rust | Cargo.toml | Cargo.lock |
-| Go | go.mod | go.sum |
+| Python (pip) | requirements.txt, pyproject.toml, setup.py, Pipfile | Pipfile.lock, poetry.lock |
+| Python (conda) | environment.yml, conda-env.yml | conda-lock.yml |
 
 **Detection Flow**:
 ```text
 1. Scan project root for manifest files
-2. Identify primary language/framework
-3. Parse direct dependencies
-4. Map to lock file for exact versions
-5. Build dependency tree (direct + transitive)
-6. Cache for session
+2. Check for conda environment.yml first (preferred for scientific Python)
+3. Fall back to pyproject.toml / requirements.txt
+4. Parse direct dependencies
+5. Map to lock file for exact versions
+6. Build dependency tree (direct + transitive)
+7. Cache for session
 ```
 
 ### 2. Dependency Change Tracking
@@ -64,22 +63,23 @@ On change detected:
 DEPENDENCY CHANGES DETECTED
 ════════════════════════════════════════
 
-File Modified: package.json
+File Modified: pyproject.toml
 
 ## Added
-+ lodash@4.17.21
-+ axios@1.6.0
++ xarray==2024.1.0
++ netCDF4==1.6.5
 
 ## Removed
-- request@2.88.2 (deprecated)
+- deprecated-pkg==1.0.0
 
 ## Updated
-~ express: 4.18.0 → 4.19.0 (minor)
+~ numpy: 1.26.0 → 1.26.4 (patch)
+~ pandas: 2.1.0 → 2.2.0 (minor)
 
 ## Validation
-- lodash@4.17.21: ✓ Clean
-- axios@1.6.0: ✓ Clean
-- express@4.19.0: ✓ Clean
+- xarray==2024.1.0: ✓ Clean
+- netCDF4==1.6.5: ✓ Clean
+- numpy==1.26.4: ✓ Clean
 
 All changes validated.
 ════════════════════════════════════════
@@ -87,21 +87,17 @@ All changes validated.
 
 ### 3. Security Audit
 
-**Audit Commands by Language**:
+**Audit Commands**:
 ```text
-Python:
+Python (pip):
   pip-audit
   safety check -r requirements.txt
 
-JavaScript:
-  npm audit --json
-  yarn audit --json
-
-Rust:
-  cargo audit
-
-Go:
-  govulncheck ./...
+Python (conda):
+  # No direct conda audit tool; check pip packages within conda env
+  pip-audit --desc
+  # Check for known CVEs in conda packages
+  conda list --json | python -c "import sys,json; [print(f'{p[\"name\"]}=={p[\"version\"]}') for p in json.load(sys.stdin)]" | safety check --stdin
 ```
 
 **Audit Report Format**:
@@ -124,8 +120,6 @@ CVE-2024-XXXXX: SQL Injection in [package]
 - Action: Upgrade to sqlparse>=0.4.4
 
 ### HIGH (Should Fix)
-
-CVE-2024-YYYYY: XSS in [package]
 ...
 
 ### MEDIUM (Review)
@@ -144,8 +138,7 @@ CVE-2024-YYYYY: XSS in [package]
 
 ## Recommendations
 1. Run: pip install --upgrade sqlparse
-2. Run: npm audit fix
-3. Review low-severity issues
+2. Review low-severity issues
 
 Auto-fix available for 3 vulnerabilities. Apply?
 ════════════════════════════════════════
@@ -165,15 +158,33 @@ Latest: [latest-version]
 
 Runtime Compatibility:
 - Python version: 3.11 → [COMPATIBLE | INCOMPATIBLE]
-- Node version: 22+ LTS → [COMPATIBLE | INCOMPATIBLE]
 
 Dependency Conflicts:
 - [existing-pkg] requires [dep]<2.0
 - [new-pkg] requires [dep]>=2.5
 - CONFLICT: Version ranges incompatible
 
-Peer Dependencies:
-- Requires: react>=18.0 → [SATISFIED | MISSING]
+## Conda/Pip Ecosystem Checks
+
+GDAL Version Conflicts:
+- System GDAL: [version]
+- rasterio requires: GDAL [version range]
+- fiona requires: GDAL [version range]
+- Status: [COMPATIBLE | CONFLICT]
+
+NumPy ABI Compatibility:
+- Installed numpy: [version]
+- Package compiled against: numpy [version]
+- Status: [COMPATIBLE | ABI MISMATCH]
+  NOTE: numpy ABI breaks between major versions (1.x vs 2.x)
+  Packages compiled against numpy 1.x may segfault with numpy 2.x
+
+Conda vs Pip Mixing:
+- Package available via conda-forge: [YES | NO]
+- Recommendation: [Install via conda | pip is safe | WARNING: prefer conda]
+  NOTE: Mixing conda and pip for packages with C extensions (numpy, scipy,
+  gdal, rasterio, fiona, shapely, pyproj) frequently causes ABI conflicts.
+  Always prefer conda-forge for these packages.
 
 ## License Analysis
 
@@ -200,17 +211,13 @@ Reason: [explanation]
 
 **Check Commands**:
 ```text
-Python:
+Python (pip):
   pip list --outdated --format=json
 
-JavaScript:
-  npm outdated --json
-
-Rust:
-  cargo outdated --format json
-
-Go:
-  go list -m -u all
+Python (conda):
+  conda update --dry-run --all --json 2>/dev/null
+  # Or compare installed vs latest
+  conda search --outdated --json
 ```
 
 **Outdated Report**:
@@ -221,14 +228,14 @@ OUTDATED PACKAGES REPORT
 ## Major Updates (Breaking Changes Likely)
 | Package | Current | Latest | Age |
 |---------|---------|--------|-----|
-| django | 3.2.0 | 5.0.0 | 2 years |
-| react | 17.0.2 | 18.2.0 | 1 year |
+| numpy | 1.26.4 | 2.1.0 | 6 months |
+| pandas | 2.1.0 | 2.2.0 | 3 months |
 
 ## Minor Updates (New Features)
 | Package | Current | Latest |
 |---------|---------|--------|
-| requests | 2.28.0 | 2.31.0 |
-| lodash | 4.17.20 | 4.17.21 |
+| xarray | 2024.1.0 | 2024.6.0 |
+| rasterio | 1.3.9 | 1.3.10 |
 
 ## Patch Updates (Bug Fixes)
 | Package | Current | Latest |
@@ -236,14 +243,20 @@ OUTDATED PACKAGES REPORT
 | pytest | 7.4.0 | 7.4.3 |
 
 ## Summary
-- Major: 2 (review carefully)
+- Major: 2 (review carefully -- especially numpy 1.x→2.x ABI break)
 - Minor: 5 (generally safe)
 - Patch: 8 (recommended)
 
 ## Recommendations
 1. Apply patch updates: Low risk, bug fixes
 2. Review minor updates: Check changelogs
-3. Plan major updates: May require code changes
+3. Plan major updates: May require code changes and recompilation of C extensions
+
+## Conda-Specific Notes
+- Before major numpy update: Check that all C-extension packages have
+  conda-forge builds for the new numpy version
+- Use `conda update --dry-run <pkg>` to preview dependency resolution
+- Never `pip install --upgrade numpy` in a conda environment
 
 Update patch versions now?
 ════════════════════════════════════════
@@ -281,9 +294,9 @@ LICENSE COMPLIANCE
 ## License Distribution
 | License | Count | Packages |
 |---------|-------|----------|
-| MIT | 45 | lodash, express, ... |
-| Apache-2.0 | 12 | ... |
-| BSD-3 | 8 | ... |
+| MIT | 25 | numpy, pandas, ... |
+| BSD-3 | 15 | scipy, scikit-learn, ... |
+| Apache-2.0 | 8 | ... |
 
 ## Review Required
 | Package | License | Reason |
@@ -338,6 +351,7 @@ LICENSE COMPLIANCE
 ? Updating existing packages
 ? Applying security fixes
 ? Removing dependencies
+? Switching package from pip to conda or vice versa
 ```
 
 ### Alert Immediately
@@ -346,6 +360,8 @@ LICENSE COMPLIANCE
 ! License compliance violation
 ! Major breaking update available
 ! Abandoned/deprecated package detected
+! NumPy ABI incompatibility detected
+! Conda/pip conflict detected
 ```
 
 ### Block Operations
@@ -353,6 +369,7 @@ LICENSE COMPLIANCE
 ✗ Adding package with critical vulnerability
 ✗ Adding package with incompatible license
 ✗ Downgrading to vulnerable version
+✗ pip install of C-extension package in conda env without checking conda-forge first
 ```
 
 ---
@@ -365,6 +382,7 @@ LICENSE COMPLIANCE
 - [ ] Compatible with existing dependencies
 - [ ] License compatible with project
 - [ ] Documented in appropriate manifest
+- [ ] Available via conda-forge (preferred for scientific packages with C extensions)
 
 **Before /save Checkpoint**:
 - [ ] No new critical vulnerabilities introduced
@@ -393,7 +411,9 @@ LICENSE COMPLIANCE
       "major": "warn",
       "minor": "info",
       "patch": "auto"
-    }
+    },
+    "preferConda": true,
+    "condaChannels": ["conda-forge", "defaults"]
   }
 }
 ```

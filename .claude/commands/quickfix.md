@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(ruff:*), Bash(npm run:*), Bash(npx:*), Bash(cargo:*), Bash(go:*), Bash(gofmt:*), Bash(prettier:*), Bash(black:*), Bash(git diff:*)
+allowed-tools: Bash(ruff:*), Bash(black:*), Bash(isort:*), Bash(git diff:*)
 description: Run linters with auto-fix on modified files
 ---
 
@@ -20,7 +20,7 @@ File types changed:
 !`git diff --name-only HEAD 2>/dev/null | sed 's/.*\.//' | sort -u`
 
 Project type detection:
-!`ls -la pyproject.toml package.json Cargo.toml go.mod 2>/dev/null | head -5 || echo "Unknown project type"`
+!`ls -la pyproject.toml setup.cfg setup.py 2>/dev/null | head -5 || echo "Unknown project type"`
 
 ## Task
 
@@ -38,43 +38,6 @@ ruff check --fix .
 # Alternative: black + isort
 black .
 isort .
-```
-
-### JavaScript/TypeScript Project (package.json)
-
-```bash
-# ESLint with auto-fix
-npx eslint --fix .
-
-# Prettier formatting
-npx prettier --write .
-
-# If npm scripts exist
-npm run lint:fix 2>/dev/null || npm run lint -- --fix 2>/dev/null || true
-npm run format 2>/dev/null || true
-```
-
-### Rust Project (Cargo.toml)
-
-```bash
-# Format code
-cargo fmt
-
-# Fix clippy warnings (where possible)
-cargo clippy --fix --allow-dirty --allow-staged
-```
-
-### Go Project (go.mod)
-
-```bash
-# Format code
-gofmt -w .
-
-# Fix imports
-goimports -w .
-
-# Run go mod tidy
-go mod tidy
 ```
 
 ### Execution Strategy

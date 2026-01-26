@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "name": "dependency-auditors",
-  "description": "MCP configuration for dependency security auditing and version management",
-  "version": "1.0.0",
+  "description": "MCP configuration for Python dependency security auditing and version management",
+  "version": "2.0.0",
 
   "securityAuditors": {
     "pip-audit": {
@@ -36,67 +36,6 @@
         "vulnerabilityPattern": "->\\s+(\\S+)\\s+affected\\s+by"
       },
       "requiresApiKey": false
-    },
-
-    "npm-audit": {
-      "language": "javascript",
-      "command": "npm audit",
-      "detection": ["package.json", "package-lock.json"],
-      "capabilities": {
-        "audit": "npm audit",
-        "auditJson": "npm audit --json",
-        "fix": "npm audit fix",
-        "fixForce": "npm audit fix --force",
-        "auditProduction": "npm audit --production"
-      },
-      "outputParsing": {
-        "vulnerabilityPattern": "(low|moderate|high|critical)",
-        "summaryPattern": "(\\d+) vulnerabilities"
-      },
-      "databases": ["npm Advisory Database", "GitHub Advisory Database"]
-    },
-
-    "yarn-audit": {
-      "language": "javascript",
-      "command": "yarn audit",
-      "detection": ["yarn.lock"],
-      "capabilities": {
-        "audit": "yarn audit",
-        "auditJson": "yarn audit --json"
-      },
-      "outputParsing": {
-        "vulnerabilityPattern": "(info|low|moderate|high|critical)"
-      },
-      "databases": ["npm Advisory Database"]
-    },
-
-    "cargo-audit": {
-      "language": "rust",
-      "command": "cargo audit",
-      "detection": ["Cargo.toml", "Cargo.lock"],
-      "capabilities": {
-        "audit": "cargo audit",
-        "auditJson": "cargo audit --json",
-        "fix": "cargo audit fix"
-      },
-      "outputParsing": {
-        "vulnerabilityPattern": "RUSTSEC-\\d+-\\d+"
-      },
-      "databases": ["RustSec Advisory Database"]
-    },
-
-    "govulncheck": {
-      "language": "go",
-      "command": "govulncheck",
-      "detection": ["go.mod"],
-      "capabilities": {
-        "audit": "govulncheck ./...",
-        "auditJson": "govulncheck -json ./..."
-      },
-      "outputParsing": {
-        "vulnerabilityPattern": "GO-\\d+-\\d+"
-      },
-      "databases": ["Go Vulnerability Database"]
     }
   },
 
@@ -114,40 +53,16 @@
       }
     },
 
-    "npm": {
-      "language": "javascript",
-      "command": "npm outdated",
-      "detection": ["package.json"],
+    "conda": {
+      "language": "python",
+      "command": "conda list --revisions",
+      "detection": ["environment.yml", "environment.yaml", "conda-lock.yml"],
       "capabilities": {
-        "check": "npm outdated",
-        "checkJson": "npm outdated --json"
-      },
-      "outputParsing": {
-        "packagePattern": "(\\S+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)"
-      }
-    },
-
-    "cargo": {
-      "language": "rust",
-      "command": "cargo outdated",
-      "detection": ["Cargo.toml"],
-      "capabilities": {
-        "check": "cargo outdated",
-        "checkJson": "cargo outdated --format json"
+        "check": "conda update --all --dry-run",
+        "list": "conda list",
+        "export": "conda env export --no-builds"
       },
       "outputParsing": {}
-    },
-
-    "go": {
-      "language": "go",
-      "command": "go list -m -u all",
-      "detection": ["go.mod"],
-      "capabilities": {
-        "check": "go list -m -u all"
-      },
-      "outputParsing": {
-        "updatePattern": "\\[([^\\]]+)\\]"
-      }
     }
   },
 
@@ -159,25 +74,6 @@
         "list": "pip-licenses",
         "listJson": "pip-licenses --format=json",
         "listCsv": "pip-licenses --format=csv"
-      }
-    },
-
-    "license-checker": {
-      "language": "javascript",
-      "command": "npx license-checker",
-      "capabilities": {
-        "list": "npx license-checker",
-        "listJson": "npx license-checker --json",
-        "summary": "npx license-checker --summary"
-      }
-    },
-
-    "cargo-license": {
-      "language": "rust",
-      "command": "cargo license",
-      "capabilities": {
-        "list": "cargo license",
-        "listJson": "cargo license --json"
       }
     }
   },
@@ -214,7 +110,8 @@
     "Unlicense",
     "0BSD",
     "CC0-1.0",
-    "WTFPL"
+    "PSF-2.0",
+    "HPND"
   ],
 
   "reviewRequiredLicenses": [
@@ -222,9 +119,7 @@
     "GPL-3.0",
     "LGPL-2.1",
     "LGPL-3.0",
-    "MPL-2.0",
-    "EPL-1.0",
-    "EPL-2.0"
+    "MPL-2.0"
   ],
 
   "forbiddenLicenses": [

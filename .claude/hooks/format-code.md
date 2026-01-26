@@ -13,12 +13,8 @@ Automatically formats code files after Write or Edit tool operations. Detects fi
 | Extension | Primary Formatter | Fallback |
 |-----------|-------------------|----------|
 | `.py` | ruff format + check --fix | black |
-| `.js`, `.jsx`, `.ts`, `.tsx` | prettier | npx prettier |
 | `.json`, `.md`, `.mdx` | prettier | npx prettier |
 | `.yaml`, `.yml` | prettier | npx prettier |
-| `.css`, `.scss`, `.html` | prettier | npx prettier |
-| `.rs` | rustfmt | - |
-| `.go` | gofmt + goimports | - |
 | `.sh`, `.bash` | shfmt | - |
 | `.toml` | taplo | - |
 
@@ -55,7 +51,7 @@ Add to `.claude/settings.json`:
 ## Requirements
 
 - jq (for JSON parsing)
-- Formatters must be installed separately (ruff, prettier, rustfmt, etc.)
+- Formatters must be installed separately (ruff, shfmt, taplo, prettier for config/markdown files)
 
 ## See Also
 

@@ -114,14 +114,6 @@ Available commands via `.claude/commands/`:
 | `/debug <issue>` | Structured debugging with root cause analysis |
 | `/status` | Project health dashboard: git, tests, docs, dependencies |
 
-### TDD & Quality Commands
-| Command | Purpose |
-|---------|---------|
-| `/tdd <feature>` | Test-driven development: RED-GREEN-REFACTOR cycle |
-| `/test-coverage` | Coverage analysis with gap identification |
-| `/build-fix` | Diagnose and fix build/type errors |
-| `/learn` | Extract reusable patterns to ~/.claude/skills/learned/ |
-
 ### Multi-Agent Coordination
 | Command | Purpose |
 |---------|---------|
@@ -226,68 +218,76 @@ The `dependency_tracker` skill monitors:
 
 ---
 
-## XI. MCP CONFIGURATIONS
+## XI. CRITICAL ENGAGEMENT PROTOCOL
+
+The agent operates under a critical engagement protocol that prioritizes **long-term correctness over short-term agreement**:
+
+- **Challenge before implementing** — if a better approach exists, state it before writing code
+- **No sycophancy** — banned phrases include "Excellent!", "Great idea!", "Perfect!"
+- **Flag reinvented wheels** — mention standard solutions, even unprompted
+- **Resist scope creep** — ask "What does this solve that the simpler version doesn't?"
+- **Scale pushback to consequences** — forceful objection for approaches causing data corruption or architectural dead-ends
+- **Flag technical debt explicitly** — especially in pipeline code where issues compound
+
+See `CLAUDE.md` Section X for the full 12-rule protocol.
+
+---
+
+## XII. MCP CONFIGURATIONS
 
 MCP server configurations in `.claude/mcp/`:
 
 | Config | Purpose |
 |--------|---------|
-| `test_runners.json` | pytest, jest, cargo test, go test |
-| `linters.json` | ruff, eslint, clippy, golangci-lint |
-| `dependency_auditors.json` | pip-audit, npm audit, cargo audit |
+| `test_runners.json` | pytest, unittest, make test |
+| `linters.json` | ruff, pylint, mypy, pyright |
+| `dependency_auditors.json` | pip-audit, safety, pip-licenses |
 
 ### Test Runners (`test_runners.json`)
 Configures test framework integrations with auto-detection:
 - **pytest** (Python): Coverage support, verbose output, parallel execution
-- **jest/vitest** (JavaScript/TypeScript): Watch mode, coverage reports
-- **cargo test** (Rust): Doc tests, integration tests
-- **go test** (Go): Race detection, benchmarks
+- **unittest** (Python): Standard library test runner
 - **make test**: Generic Makefile-based testing
 
 ### Linters (`linters.json`)
 Configures linter and formatter integrations:
-- **Python**: ruff (lint + format), pylint, mypy, pyright
-- **JavaScript/TypeScript**: eslint, prettier, tsc
-- **Rust**: clippy, rustfmt
-- **Go**: golangci-lint, gofmt, goimports
+- **ruff**: Lint + format (primary)
+- **pylint**: Deep analysis
+- **mypy**: Type checking (gradual typing)
+- **pyright**: Type checking (strict)
 
 ### Dependency Auditors (`dependency_auditors.json`)
 Configures security and dependency management:
-- **Security**: pip-audit, safety, npm audit, cargo audit, govulncheck
-- **Outdated**: pip list --outdated, npm outdated, cargo outdated
-- **Licenses**: pip-licenses, license-checker, cargo-license
+- **Security**: pip-audit, safety
+- **Outdated**: pip list --outdated
+- **Licenses**: pip-licenses
 
 ---
 
-## XII. SUBAGENTS
+## XIII. SUBAGENTS
 
 Specialized agents in `.claude/agents/` for delegated tasks:
 
 | Agent | Purpose | Model |
 |-------|---------|-------|
-| `architect` | System design, ADRs, architecture decisions | opus |
-| `tdd-guide` | TDD methodology enforcement, test-first development | sonnet |
-| `build-error-resolver` | Build/type error resolution with minimal diffs | sonnet |
 | `code-simplifier` | Simplify and clean up code after implementation | sonnet |
 | `verify-app` | End-to-end application verification | sonnet |
 | `security-auditor` | Security-focused code review (read-only) | sonnet |
 | `background-verifier` | Long-running verification (cost-effective) | haiku |
-| `ui-verifier` | Browser UI verification (requires Chrome) | sonnet |
+| `notebook-verifier` | Marimo notebook verification (reproducibility, execution) | sonnet |
 
 ### Usage
 
 Subagents are invoked automatically or via commands:
-- `architect`: Use when planning features or making architectural decisions
-- `tdd-guide`: Invoked via `/tdd` for test-first development
-- `build-error-resolver`: Invoked via `/build-fix` for build errors
 - `verify-app`: Auto-triggered before `/done`
 - `security-auditor`: Triggered via `/review --security`
 - `background-verifier`: Triggered via `/verify-background`
+- `notebook-verifier`: After notebook changes or before publishing
 - `code-simplifier`: Manually invoked after feature completion
 
 ---
 
-## XIII. HOOKS
+## XIV. HOOKS
 
 Automated behaviors via `.claude/hooks/`:
 
@@ -310,82 +310,6 @@ Automated behaviors via `.claude/hooks/`:
 ### SubagentStop Hooks
 - Evaluate verification agent findings
 - Ensure issues are addressed before proceeding
-
-### PreCompact Hooks
-- Save state before context compaction
-- Update session context with progress
-- Preserve in-progress work information
-
----
-
-## XIV. CONTEXT MODES
-
-Dynamic contexts in `.claude/contexts/` for different working modes:
-
-| Context | Mode | Focus |
-|---------|------|-------|
-| `dev.md` | Development | Implementation, coding, TDD |
-| `research.md` | Research | Exploration, investigation (read-only) |
-| `review.md` | Review | Code review, security audit |
-
-### Development Context
-- Write code first, explain after
-- Follow TDD methodology
-- Run tests after changes
-- Keep commits atomic
-
-### Research Context
-- Read widely before concluding
-- Document findings as you go
-- Don't write code until understanding is clear
-- Preserve existing code (exploration only)
-
-### Review Context
-- Prioritize issues by severity
-- Check for security vulnerabilities
-- Suggest fixes, not just problems
-- Verify test coverage
-
----
-
-## XIV-B. ARCHITECTURE DECISION RECORDS (ADRs)
-
-Significant architectural decisions are documented in `docs/adrs/`:
-
-### ADR Format
-```markdown
-# ADR-XXX: [Title]
-
-## Status
-[Proposed | Accepted | Deprecated | Superseded]
-
-## Context
-[What is motivating this decision?]
-
-## Decision
-[What change are we making?]
-
-## Consequences
-### Positive
-- [Benefits]
-
-### Negative
-- [Drawbacks]
-
-### Alternatives Considered
-- [Why not chosen]
-
-## Date
-YYYY-MM-DD
-```
-
-### When to Create ADRs
-- Choosing frameworks or major libraries
-- Database schema decisions
-- API design choices
-- Authentication/authorization approach
-- Caching strategies
-- Integration patterns
 
 ---
 
@@ -412,7 +336,7 @@ Git status: !`git status --short`
 
 ---
 
-## XV. VERIFICATION WORKFLOWS
+## XVI. VERIFICATION WORKFLOWS
 
 The `verifier` skill ensures work quality:
 
@@ -434,7 +358,7 @@ The `verifier` skill ensures work quality:
 
 ---
 
-## XVI. AUTONOMOUS EXECUTION
+## XVII. AUTONOMOUS EXECUTION
 
 See `docs/07_autonomous.md` for detailed configuration.
 
@@ -460,7 +384,7 @@ See `docs/07_autonomous.md` for detailed configuration.
 
 ---
 
-## XVII. FILE SYSTEM MAP (EXTENDED)
+## XVIII. FILE SYSTEM MAP (EXTENDED)
 
 ```
 project/
@@ -473,10 +397,7 @@ project/
 │   ├── 05_guides.md        # Environment guides
 │   ├── 06_multi_agent.md   # Multi-agent overview (see Section IX)
 │   ├── 07_autonomous.md    # Autonomous execution guide (see Section XVI)
-│   ├── logs/               # Session memory
-│   │   └── session_context.md
-│   └── adrs/               # Architecture Decision Records
-│       └── ADR-001-example.md
+│   └── logs/               # Session memory
 │
 ├── src/                    # Source code
 ├── tests/                  # Test suite
@@ -484,35 +405,27 @@ project/
 ├── configs/                # Configuration files
 │
 └── .claude/                # Claude Code configuration
-    ├── commands/           # CLI commands (22 total)
+    ├── commands/           # CLI commands (18 total)
     │   ├── boot.md, save.md, done.md
     │   ├── feature.md, refine.md, discover.md
     │   ├── test.md, review.md, debug.md, status.md
     │   ├── delegate.md, sync.md
     │   ├── commit-push-pr.md, quickfix.md, precommit.md
     │   ├── investigate.md, verify-background.md, browser-test.md
-    │   ├── tdd.md, build-fix.md, test-coverage.md, learn.md  # NEW
     │   │
     ├── skills/             # Auto-enforced behaviors (7 total)
     │   ├── context_manager.md, arch_enforcer.md
     │   ├── test_enforcer.md, parallel_coordinator.md
     │   ├── dependency_tracker.md, verifier.md, skill_recommender.md
     │   │
-    ├── agents/             # Specialized subagents (8 total)
-    │   ├── architect.md, tdd-guide.md, build-error-resolver.md  # NEW
+    ├── agents/             # Specialized subagents (5 total)
     │   ├── code-simplifier.md, verify-app.md
     │   ├── security-auditor.md, background-verifier.md
-    │   └── ui-verifier.md
+    │   └── notebook-verifier.md
     │   │
-    ├── contexts/           # Dynamic context modes (NEW)
-    │   ├── dev.md          # Development mode
-    │   ├── research.md     # Research mode
-    │   └── review.md       # Review mode
-    │   │
-    ├── hooks/              # Automation hooks (5 total)
+    ├── hooks/              # Automation hooks (4 total)
     │   ├── format-code.sh, markdown-formatter.py
     │   ├── validate-changes.sh, security-check.sh
-    │   └── debug-statement-check.sh  # NEW
     │   │
     ├── mcp/                # MCP configurations
     │   ├── test_runners.json

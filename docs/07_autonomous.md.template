@@ -91,9 +91,9 @@ Enable sandbox mode for:
 |----------|------------|
 | Reading | `Read`, `Glob`, `Grep`, file inspection |
 | Git Info | `git status`, `git log`, `git diff`, `git branch` |
-| Testing | `pytest`, `npm test`, `cargo test`, `go test` |
-| Linting | `ruff`, `eslint`, `clippy`, `golangci-lint` |
-| Formatting | `prettier`, `black`, `rustfmt`, `gofmt` |
+| Testing | `pytest`, `unittest` |
+| Linting | `ruff`, `pylint`, `mypy` |
+| Formatting | `ruff format`, `black` |
 | Analysis | Type checking, code coverage |
 
 ### Conditionally Approved
@@ -101,7 +101,7 @@ Enable sandbox mode for:
 | Category | Condition |
 |----------|-----------|
 | File Edits | In `acceptEdits` or higher mode |
-| Package Info | `pip list`, `npm outdated` (read-only) |
+| Package Info | `pip list`, `conda list` (read-only) |
 | Dependency Audit | Security scans |
 
 ### Always Require Approval
@@ -109,7 +109,7 @@ Enable sandbox mode for:
 | Category | Operations |
 |----------|------------|
 | Git Writes | `commit`, `push`, `merge`, `rebase` |
-| Package Install | `pip install`, `npm install`, `cargo add` |
+| Package Install | `pip install`, `conda install` |
 | Deletions | `rm`, `git clean` |
 | External | API calls, downloads |
 | Credentials | Any secret/token operations |

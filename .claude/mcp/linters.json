@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "name": "linters",
-  "description": "MCP configuration for linter and formatter integrations",
-  "version": "1.0.0",
+  "description": "MCP configuration for Python linter and formatter integrations",
+  "version": "2.0.0",
 
   "servers": {
     "ruff": {
@@ -98,155 +98,12 @@
       },
       "autoFix": false,
       "defaultArgs": []
-    },
-
-    "eslint": {
-      "language": "javascript",
-      "type": "linter",
-      "command": "npx eslint",
-      "detection": [
-        ".eslintrc",
-        ".eslintrc.js",
-        ".eslintrc.json",
-        ".eslintrc.yml",
-        "eslint.config.js",
-        "eslint.config.mjs",
-        "package.json:eslintConfig"
-      ],
-      "capabilities": {
-        "check": "npx eslint {scope}",
-        "checkFix": "npx eslint --fix {scope}",
-        "checkJson": "npx eslint --format json {scope}"
-      },
-      "severityMapping": {
-        "error": "error",
-        "warning": "warning"
-      },
-      "autoFix": true,
-      "defaultArgs": []
-    },
-
-    "prettier": {
-      "language": "javascript",
-      "type": "formatter",
-      "command": "npx prettier",
-      "detection": [
-        ".prettierrc",
-        ".prettierrc.js",
-        ".prettierrc.json",
-        "prettier.config.js",
-        "package.json:prettier"
-      ],
-      "capabilities": {
-        "check": "npx prettier --check {scope}",
-        "format": "npx prettier --write {scope}",
-        "formatDiff": "npx prettier --check {scope} 2>&1"
-      },
-      "severityMapping": {},
-      "autoFix": true,
-      "defaultArgs": []
-    },
-
-    "tsc": {
-      "language": "typescript",
-      "type": "type-checker",
-      "command": "npx tsc",
-      "detection": [
-        "tsconfig.json"
-      ],
-      "capabilities": {
-        "check": "npx tsc --noEmit",
-        "checkWatch": "npx tsc --noEmit --watch"
-      },
-      "severityMapping": {
-        "error": "error"
-      },
-      "autoFix": false,
-      "defaultArgs": ["--noEmit"]
-    },
-
-    "clippy": {
-      "language": "rust",
-      "type": "linter",
-      "command": "cargo clippy",
-      "detection": ["Cargo.toml"],
-      "capabilities": {
-        "check": "cargo clippy -- -D warnings",
-        "checkFix": "cargo clippy --fix --allow-dirty -- -D warnings",
-        "checkAll": "cargo clippy --all-targets --all-features -- -D warnings"
-      },
-      "severityMapping": {
-        "error": "error",
-        "warning": "warning",
-        "note": "info"
-      },
-      "autoFix": true,
-      "defaultArgs": ["--", "-D", "warnings"]
-    },
-
-    "rustfmt": {
-      "language": "rust",
-      "type": "formatter",
-      "command": "cargo fmt",
-      "detection": ["Cargo.toml", "rustfmt.toml", ".rustfmt.toml"],
-      "capabilities": {
-        "check": "cargo fmt -- --check",
-        "format": "cargo fmt"
-      },
-      "severityMapping": {},
-      "autoFix": true,
-      "defaultArgs": []
-    },
-
-    "golangci-lint": {
-      "language": "go",
-      "type": "linter",
-      "command": "golangci-lint",
-      "detection": [
-        ".golangci.yml",
-        ".golangci.yaml",
-        ".golangci.toml",
-        ".golangci.json",
-        "go.mod"
-      ],
-      "capabilities": {
-        "check": "golangci-lint run {scope}",
-        "checkFix": "golangci-lint run --fix {scope}",
-        "checkJson": "golangci-lint run --out-format json {scope}"
-      },
-      "severityMapping": {
-        "error": "error",
-        "warning": "warning"
-      },
-      "autoFix": true,
-      "defaultArgs": []
-    },
-
-    "gofmt": {
-      "language": "go",
-      "type": "formatter",
-      "command": "gofmt",
-      "detection": ["go.mod"],
-      "capabilities": {
-        "check": "gofmt -l {scope}",
-        "format": "gofmt -w {scope}",
-        "formatDiff": "gofmt -d {scope}"
-      },
-      "severityMapping": {},
-      "autoFix": true,
-      "defaultArgs": []
     }
   },
 
   "autoDetection": {
     "enabled": true,
-    "priority": {
-      "python": ["ruff", "mypy", "pylint", "pyright"],
-      "javascript": ["eslint", "prettier", "tsc"],
-      "typescript": ["eslint", "prettier", "tsc"],
-      "rust": ["clippy", "rustfmt"],
-      "go": ["golangci-lint", "gofmt"]
-    }
+    "priority": ["ruff", "mypy", "pylint", "pyright"]
   },
 
   "preCommitIntegration": {

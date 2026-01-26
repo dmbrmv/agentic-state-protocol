@@ -45,12 +45,6 @@ def detect_language(code: str) -> str:
     if re.search(r'^\s*(if __name__|print\(|self\.|elif|except|raise|with\s+)', s, re.MULTILINE):
         return 'python'
 
-    # JavaScript/TypeScript
-    if re.search(r'\b(function|const|let|var|import|export|=>|async|await)\b', s):
-        if re.search(r':\s*(string|number|boolean|any|void)\b', s) or re.search(r'<[A-Z]\w*>', s):
-            return 'typescript'
-        return 'javascript'
-
     # Bash/Shell
     if re.search(r'^#!.*\b(bash|sh|zsh)\b', s, re.MULTILINE):
         return 'bash'
@@ -62,14 +56,6 @@ def detect_language(code: str) -> str:
     # SQL
     if re.search(r'\b(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|FROM|WHERE|JOIN)\s+', s, re.IGNORECASE):
         return 'sql'
-
-    # Rust
-    if re.search(r'\b(fn|let|mut|impl|struct|enum|pub|mod|use|crate)\b', s):
-        return 'rust'
-
-    # Go
-    if re.search(r'\b(func|package|import|type|struct|interface|go|defer|chan)\b', s):
-        return 'go'
 
     # HTML
     if re.search(r'<(!DOCTYPE|html|head|body|div|span|p|a|img|script|style)\b', s, re.IGNORECASE):

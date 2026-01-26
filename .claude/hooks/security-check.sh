@@ -41,7 +41,6 @@ if [ -n "$FILE_PATH" ]; then
         "\.aws/credentials"
         "\.ssh/config"
         "\.netrc"
-        "\.npmrc"
         "\.pypirc"
         "\.docker/config"
         "password"
@@ -69,13 +68,10 @@ if [ -n "$FILE_PATH" ]; then
         "^/sbin/"
         "^/root/"
         "^/home/[^/]+/\."  # Hidden files in other users' homes
-        "node_modules/"
         "__pycache__/"
         "\.git/"
         "\.venv/"
         "venv/"
-        "target/debug/"
-        "target/release/"
     )
 
     for pattern in "${BLOCKED_DIRECTORIES[@]}"; do
@@ -139,12 +135,8 @@ if [ -n "$COMMAND" ]; then
     INSTALL_PATTERNS=(
         "pip install"
         "pip3 install"
-        "npm install"
-        "npm i[[:space:]]"
-        "yarn add"
-        "pnpm add"
-        "cargo install"
-        "go install"
+        "conda install"
+        "mamba install"
         "apt install"
         "apt-get install"
         "brew install"

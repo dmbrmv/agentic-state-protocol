@@ -1,133 +1,232 @@
 {
+  "_comment": "Copy to settings.local.json and customize. Comments use // prefix for documentation.",
+
   "permissions": {
     "allow": [
-      "// === READ PERMISSIONS ===",
-      "Read(docs/**)",
-      "Read(src/**)",
-      "Read(tests/**)",
-      "Read(scripts/**)",
-      "Read(configs/**)",
-      "Read(CLAUDE.md)",
-      "Read(README.md)",
-      "Read(pyproject.toml)",
-      "Read(package.json)",
-      "Read(Cargo.toml)",
-      "Read(go.mod)",
-      "Read(requirements.txt)",
-      "Read(package-lock.json)",
-      "Read(yarn.lock)",
-      "Read(Cargo.lock)",
-      "Read(go.sum)",
-
-      "// === WRITE PERMISSIONS ===",
-      "Write(docs/**)",
-      "Write(src/**)",
-      "Write(tests/**)",
-      "Write(scripts/**)",
-
-      "// === EDIT PERMISSIONS ===",
-      "Edit(docs/**)",
-      "Edit(src/**)",
-      "Edit(tests/**)",
-      "Edit(scripts/**)",
-
-      "// === GIT READ PERMISSIONS ===",
+      "// === GIT READ OPERATIONS (safe, read-only) ===",
       "Bash(git status:*)",
-      "Bash(git diff:*)",
       "Bash(git log:*)",
-      "Bash(git branch:*)",
+      "Bash(git diff:*)",
       "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git remote:*)",
+      "Bash(git config --get:*)",
+      "Bash(git config --list:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(git describe:*)",
+      "Bash(git tag:*)",
 
-      "// === FILESYSTEM READ ===",
-      "Bash(ls:*)",
-      "Bash(pwd:*)",
-      "Bash(cat:*)",
-      "Bash(head:*)",
-      "Bash(tail:*)",
-      "Bash(grep:*)",
-      "Bash(find:*)",
-      "Bash(wc:*)",
-      "Bash(echo:*)",
+      "// === GIT WRITE OPERATIONS (safe, local only) ===",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git stash:*)",
+      "Bash(git checkout:*)",
+      "Bash(git switch:*)",
+      "Bash(git restore:*)",
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git reset --soft:*)",
+      "Bash(git reset HEAD:*)",
 
-      "// === TEST RUNNER PERMISSIONS ===",
-      "Bash(pytest:*)",
-      "Bash(python -m pytest:*)",
-      "Bash(npm test:*)",
-      "Bash(npm run test:*)",
-      "Bash(npx jest:*)",
-      "Bash(npx vitest:*)",
-      "Bash(cargo test:*)",
-      "Bash(go test:*)",
-      "Bash(make test:*)",
+      "// === GIT REMOTE (non-destructive) ===",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(git push origin:*)",
+      "Bash(git push -u origin:*)",
 
-      "// === LINTER PERMISSIONS ===",
-      "Bash(ruff check:*)",
-      "Bash(ruff format:*)",
-      "Bash(pylint:*)",
-      "Bash(mypy:*)",
-      "Bash(pyright:*)",
-      "Bash(npx eslint:*)",
-      "Bash(npx prettier:*)",
-      "Bash(npx tsc:*)",
-      "Bash(cargo clippy:*)",
-      "Bash(cargo fmt:*)",
-      "Bash(golangci-lint:*)",
-      "Bash(gofmt:*)",
-      "Bash(npm run lint:*)",
+      "// === GITHUB CLI ===",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr status:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh issue create:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh auth status:*)",
+      "Bash(gh api:*)",
 
-      "// === DEPENDENCY AUDIT PERMISSIONS ===",
+      "// === PYTHON & ENVIRONMENT ===",
+      "Bash(python --version:*)",
+      "Bash(python3 --version:*)",
+      "Bash(python -c:*)",
+      "Bash(python3 -c:*)",
+      "Bash(pip list:*)",
+      "Bash(pip show:*)",
+      "Bash(pip check:*)",
       "Bash(pip-audit:*)",
       "Bash(safety check:*)",
-      "Bash(npm audit:*)",
-      "Bash(yarn audit:*)",
-      "Bash(cargo audit:*)",
-      "Bash(govulncheck:*)",
-      "Bash(pip list:*)",
-      "Bash(npm outdated:*)",
-      "Bash(cargo outdated:*)",
       "Bash(pip-licenses:*)",
-      "Bash(npx license-checker:*)",
+      "Bash(which:*)",
+      "Bash(whereis:*)",
+      "Bash(env:*)",
+      "Bash(printenv:*)",
 
-      "// === MULTI-AGENT PERMISSIONS ===",
+      "// === CONDA/MAMBA ENVIRONMENT ===",
+      "Bash(conda info:*)",
+      "Bash(conda list:*)",
+      "Bash(conda activate:*)",
+      "Bash(conda deactivate:*)",
+      "Bash(conda env list:*)",
+      "Bash(mamba info:*)",
+      "Bash(mamba list:*)",
+      "Bash(mamba env list:*)",
+
+      "// === CODE QUALITY TOOLS (Python) ===",
+      "Bash(pytest:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(ruff:*)",
+      "Bash(ruff check:*)",
+      "Bash(ruff format:*)",
+      "Bash(mypy:*)",
+      "Bash(pyright:*)",
+      "Bash(black:*)",
+      "Bash(isort:*)",
+      "Bash(flake8:*)",
+      "Bash(pylint:*)",
+      "Bash(bandit:*)",
+
+      "// === FILE INSPECTION (read-only) ===",
+      "Bash(ls:*)",
+      "Bash(tree:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(file:*)",
+      "Bash(stat:*)",
+      "Bash(du:*)",
+      "Bash(df:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(pwd:*)",
+      "Bash(echo:*)",
+
+      "// === SYSTEM INSPECTION (read-only) ===",
+      "Bash(ps:*)",
+      "Bash(pgrep:*)",
+      "Bash(free:*)",
+      "Bash(uptime:*)",
+      "Bash(uname:*)",
+      "Bash(hostname:*)",
+      "Bash(date:*)",
+      "Bash(id:*)",
+      "Bash(whoami:*)",
+
+      "// === BUILD TOOLS ===",
+      "Bash(make:*)",
+      "Bash(cmake:*)",
+      "Bash(gradle:*)",
+      "Bash(mvn:*)",
+
+      "// === CONTAINERS (read-only) ===",
+      "Bash(docker ps:*)",
+      "Bash(docker images:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker inspect:*)",
+      "Bash(docker-compose ps:*)",
+      "Bash(docker-compose logs:*)",
+
+      "// === PROCESS MANAGEMENT (safe) ===",
+      "Bash(timeout:*)",
+      "Bash(time:*)",
+      "Bash(nohup:*)",
+      "Bash(wait:*)",
+      "Bash(jobs:*)",
+
+      "// === DATABASE QUERIES ===",
+      "Bash(sqlite3:*)",
+      "Bash(psql -c:*)",
+
+      "// === MULTI-AGENT ===",
       "Task(*)",
 
-      "// === WEB PERMISSIONS ===",
+      "// === WEB ACCESS ===",
       "WebSearch",
       "WebFetch"
     ],
     "deny": [
-      "// === DESTRUCTIVE GIT ===",
-      "Bash(rm -rf:*)",
+      "// === CATASTROPHIC OPERATIONS (hard block, no prompt) ===",
+      "// NOTE: Other rm/rm -rf commands NOT listed here will PROMPT for approval",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf /mnt)",
+      "Bash(rm -rf /home)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf $HOME)",
+
+      "// === GIT DESTRUCTIVE OPERATIONS ===",
       "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
       "Bash(git reset --hard:*)",
       "Bash(git clean -fd:*)",
 
-      "// === SYSTEM ACCESS ===",
+      "// === DISK/SYSTEM DESTRUCTION ===",
+      "Bash(> /dev/sda)",
+      "Bash(> /dev/sdb)",
+      "Bash(> /dev/nvme)",
+      "Bash(mkfs:*)",
+      "Bash(dd if=:*)",
+      "Bash(fdisk:*)",
+      "Bash(parted:*)",
+
+      "// === PRIVILEGE ESCALATION ===",
       "Bash(sudo:*)",
       "Bash(su:*)",
       "Bash(chmod 777:*)",
+      "Bash(chown root:*)",
+
+      "// === CONTAINER DESTRUCTIVE ===",
+      "Bash(docker rm -f:*)",
+      "Bash(docker system prune:*)",
+      "Bash(docker volume rm:*)",
 
       "// === PROTECTED PATHS ===",
       "Write(.git/**)",
       "Edit(.git/**)",
-      "Write(node_modules/**)",
       "Write(.venv/**)",
       "Write(__pycache__/**)",
-      "Write(target/**)",
 
       "// === PACKAGE MANAGEMENT (require explicit approval) ===",
       "Bash(pip install:*)",
-      "Bash(npm install:*)",
-      "Bash(yarn add:*)",
-      "Bash(cargo add:*)",
-      "Bash(go get:*)"
+      "Bash(conda install:*)",
+      "Bash(mamba install:*)"
     ]
   },
-  "settings": {
-    "model": "claude-sonnet-4-20250514",
-    "contextWindow": 200000,
-    "maxTokens": 8192
+
+  "hooks": {
+    "// DOCUMENTATION": "See https://docs.anthropic.com/en/docs/claude-code/hooks",
+
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/format-code.sh"
+          }
+        ]
+      }
+    ],
+
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/security-check.sh"
+          }
+        ]
+      }
+    ]
   },
+
   "multiAgent": {
     "enabled": true,
     "maxParallelAgents": 3,
@@ -143,193 +242,24 @@
       "docs/00_MASTER_INDEX.md",
       ".git/**",
       ".claude/**"
-    ],
-    "checkpointIntervalMinutes": 30,
-    "autoMergeOnTestPass": false
+    ]
   },
+
   "testing": {
     "enabled": true,
     "autoRunAfterChanges": true,
-    "coverageThreshold": 80,
     "testTimeoutSeconds": 300,
-    "blockDoneOnFailure": true,
-    "autoFixSuggestions": true
+    "blockDoneOnFailure": true
   },
+
   "linting": {
     "enabled": true,
     "autoFixOnSave": false,
-    "blockCommitOnError": true,
-    "allowWarnings": true
-  },
-  "dependencies": {
-    "autoAudit": true,
-    "auditOnSessionStart": true,
-    "blockCriticalVulnerabilities": true,
-    "warnOnHighVulnerabilities": true,
-    "allowedLicenses": [
-      "MIT",
-      "Apache-2.0",
-      "BSD-2-Clause",
-      "BSD-3-Clause",
-      "ISC",
-      "Unlicense"
-    ],
-    "checkOutdatedOnStatus": true
-  },
-
-  "hooks": {
-    "// DOCUMENTATION": "See https://docs.anthropic.com/en/docs/claude-code/hooks",
-
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/format-code.sh"
-          },
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/markdown-formatter.py"
-          },
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/debug-statement-check.sh"
-          }
-        ]
-      }
-    ],
-
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "Before context compaction, save current state: 1) Update docs/logs/session_context.md with progress, 2) Note any in-progress work, 3) List files modified. Return {\"ok\": true} when state is saved.",
-            "timeout": 60
-          }
-        ]
-      }
-    ],
-
-    "PreToolUse": [
-      {
-        "matcher": "Write|Edit|Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/security-check.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/validate-changes.sh"
-          }
-        ]
-      }
-    ],
-
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "Before stopping, verify: 1) All requested tasks complete, 2) Tests pass (if applicable), 3) No unresolved errors. Return {\"ok\": true} to stop or {\"ok\": false, \"reason\": \"explanation\"} to continue.",
-            "timeout": 30
-          }
-        ]
-      }
-    ],
-
-    "SubagentStop": [
-      {
-        "matcher": "verify-app|background-verifier|security-auditor",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "Evaluate if this verification agent found any issues that need to be fixed. Return {\"ok\": true} if no issues, or {\"ok\": false, \"reason\": \"list of issues\"} if problems found.",
-            "timeout": 30
-          }
-        ]
-      }
-    ],
-
-    "Notification": [
-      {
-        "matcher": "agent_complete",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo '[$(date +%H:%M:%S)] Agent completed' >> \"$CLAUDE_PROJECT_DIR\"/.claude/logs/notifications.log"
-          }
-        ]
-      }
-    ]
-  },
-
-  "subagents": {
-    "// DOCUMENTATION": "See https://docs.anthropic.com/en/docs/claude-code/sub-agents",
-    "defaultModel": "sonnet",
-    "verificationModel": "haiku",
-    "autoVerifyAfterChanges": true,
-    "backgroundVerification": true,
-    "availableAgents": [
-      {
-        "name": "code-simplifier",
-        "purpose": "Simplify and clean up code after implementation",
-        "autoTrigger": false
-      },
-      {
-        "name": "verify-app",
-        "purpose": "End-to-end application verification",
-        "autoTrigger": true,
-        "triggerOn": "beforeDone"
-      },
-      {
-        "name": "security-auditor",
-        "purpose": "Security-focused code review",
-        "autoTrigger": false
-      },
-      {
-        "name": "background-verifier",
-        "purpose": "Long-running background verification",
-        "autoTrigger": false
-      },
-      {
-        "name": "ui-verifier",
-        "purpose": "Browser UI verification",
-        "autoTrigger": false,
-        "requiresChrome": true
-      }
-    ]
-  },
-
-  "autonomy": {
-    "// DOCUMENTATION": "Configure autonomous execution behavior",
-    "sandboxMode": false,
-    "permissionMode": "default",
-    "autoApproveReadOnly": true,
-    "autoApproveLinters": true,
-    "autoApproveTests": true,
-    "autoApproveFormatters": true,
-    "requireApprovalFor": [
-      "git commit",
-      "git push",
-      "package install",
-      "file delete",
-      "external API calls"
-    ]
+    "blockCommitOnError": true
   },
 
   "verification": {
     "enabled": true,
-    "minimalThreshold": 3,
-    "standardThreshold": 10,
-    "alwaysRunSecurity": false,
     "beforeDone": true,
     "beforeCommit": true,
     "beforePR": true

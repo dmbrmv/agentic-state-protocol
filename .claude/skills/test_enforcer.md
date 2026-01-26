@@ -45,14 +45,6 @@ On file modification:
 src/module/file.py       → tests/test_file.py
                          → tests/module/test_file.py
                          → tests/test_module_file.py
-
-src/components/Button.tsx → tests/components/Button.test.tsx
-                          → __tests__/Button.test.tsx
-
-src/lib.rs               → tests/test_lib.rs (Rust)
-                         → src/lib_test.rs (inline tests)
-
-src/handler.go           → src/handler_test.go (Go convention)
 ```
 
 **Import Analysis** (secondary):
@@ -68,6 +60,21 @@ src/handler.go           → src/handler_test.go (Go convention)
 - Config file changed → Run full test suite
 - Test file changed → Run that test
 - >5 source files changed → Run full suite
+```
+
+**Marimo Notebook Test Patterns**:
+```text
+notebooks/*.py           → tests/test_notebooks.py (if exists)
+                         → Run notebook in headless mode for execution check
+```
+
+**Scientific Computing Test Patterns**:
+```text
+- Tolerance-based assertions: Use np.allclose, assert_allclose, not ==
+- Fixture data: Use np.random.RandomState(seed) for reproducible test data
+- Parametrized tests: Use @pytest.mark.parametrize with known analytical solutions
+- Slow tests: Mark with @pytest.mark.slow, skip in quick runs
+- Data-dependent tests: Mark with @pytest.mark.requires_data, skip if data unavailable
 ```
 
 ### 3. Auto-Run Rules
@@ -98,7 +105,7 @@ Running failure analysis...
 
 Test: test_function_name
 File: tests/test_module.py:42
-Framework: [pytest | jest | cargo | go]
+Framework: pytest
 
 ## Error Details
 Type: AssertionError
@@ -223,25 +230,19 @@ Command: pytest {scope} -v --tb=short
 Coverage: pytest --cov={package} --cov-report=term-missing
 ```
 
-**JavaScript/TypeScript**:
+**Scientific Python Extensions**:
 ```text
-Indicators: jest.config.*, package.json:jest, vitest.config.*
-Command: npx jest {scope} --verbose OR npx vitest run {scope}
-Coverage: --coverage flag
+Indicators: conftest.py with numpy/rasterio fixtures, tests/data/ directory
+Slow tests: pytest -m "not slow" {scope} -v --tb=short
+Full suite: pytest {scope} -v --tb=short (includes slow)
+Data tests: pytest -m "requires_data" {scope} -v (only if data available)
 ```
 
-**Rust**:
+**Marimo Notebooks**:
 ```text
-Indicators: Cargo.toml
-Command: cargo test {scope} -- --nocapture
-Coverage: cargo tarpaulin
-```
-
-**Go**:
-```text
-Indicators: go.mod, *_test.go files
-Command: go test {scope} -v
-Coverage: go test -coverprofile=coverage.out
+Indicators: notebooks/*.py with "import marimo", marimo.App()
+Command: python {notebook_path} (headless execution check)
+Validation: Check exit code and stderr for errors
 ```
 
 ---

@@ -9,7 +9,7 @@ agent: background-verifier
 ## Pre-computed Context
 
 Project type:
-!`ls pyproject.toml package.json Cargo.toml go.mod 2>/dev/null | head -1 || echo "unknown"`
+!`ls pyproject.toml setup.cfg setup.py 2>/dev/null | head -1 || echo "unknown"`
 
 Current branch:
 !`git branch --show-current 2>/dev/null || echo "not a git repo"`

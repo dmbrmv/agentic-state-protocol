@@ -225,11 +225,7 @@ When conflicts arise, this is the priority order:
 ## Supported Tech Stacks
 
 The init wizard supports:
-- **Python** - ruff, pyright, pytest
-- **JavaScript/TypeScript** - prettier, eslint, jest
-- **Rust** - rustfmt, clippy, cargo test
-- **Go** - gofmt, golangci-lint, go test
-- **Other** - customizable templates
+- **Python** (ML/Data Science, Earth Science, Spatial Web Apps) - ruff, pyright, pytest
 
 ## Architecture Patterns
 
@@ -268,7 +264,7 @@ PRECOMMIT
 2. **Transparent Decisions** - Authority hierarchy is explicit
 3. **Automatic Sync** - Docs and code stay aligned
 4. **Reproducible** - Same workflow for every task
-5. **Portable** - Works across any project, any tech stack
+5. **Portable** - Works across any Python project
 
 ## Customization After Adoption
 
@@ -336,7 +332,7 @@ For advanced usage, see these sections in `docs/00_MASTER_INDEX.md`:
 
 The `init_project.py` wizard configures:
 1. **Project Name** - Sets the project identifier
-2. **Tech Stack** - Python, JavaScript/TypeScript, Rust, Go, or Other
+2. **Tech Stack** - Python (ML/Data Science, Earth Science, Spatial Web Apps)
 3. **Architecture Pattern** - Monolithic, Data Pipeline, or Microservices
 4. **Git Setup** - Optional repository initialization
 

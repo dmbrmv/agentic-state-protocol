@@ -19,14 +19,10 @@ Auto-detects programming language for unlabeled code blocks:
 | Language | Detection Patterns |
 |----------|-------------------|
 | Python | `def`, `class`, `import`, `from`, `if __name__` |
-| JavaScript | `function`, `const`, `let`, `var`, `=>` |
-| TypeScript | JS patterns + type annotations (`: string`, `<T>`) |
 | JSON | Starts with `{` or `[`, valid JSON parse |
 | YAML | `---`, key-value patterns |
 | Bash/Shell | Shebang, `if/then/fi`, `$VAR`, `&&`, `\|\|` |
 | SQL | `SELECT`, `INSERT`, `UPDATE`, `DELETE`, `CREATE` |
-| Rust | `fn`, `let`, `mut`, `impl`, `struct`, `enum` |
-| Go | `func`, `package`, `type`, `interface`, `chan` |
 | HTML | Standard HTML tags |
 | CSS | Selector patterns with `{}` |
 | XML | `<?xml`, namespaced tags |

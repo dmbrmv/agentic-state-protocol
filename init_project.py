@@ -2,8 +2,8 @@
 """
 Agentic State Protocol v3.0 - Project Initializer
 
-Interactive wizard to bootstrap a new project with the Agentic State Protocol.
-This script creates a disciplined development environment for AI-assisted coding.
+Interactive wizard to bootstrap a new Python project for ML, data science,
+and earth science with the Agentic State Protocol.
 
 Usage:
     python init_project.py                    # Interactive mode
@@ -17,7 +17,6 @@ Requirements:
 from __future__ import annotations
 
 import argparse
-import os
 import re
 import shutil
 import subprocess
@@ -32,17 +31,33 @@ from typing import Any
 # ============================================================================
 
 TECH_STACKS = {
-    "1": ("Python", "python"),
-    "2": ("JavaScript/TypeScript", "javascript"),
-    "3": ("Rust", "rust"),
-    "4": ("Go", "go"),
-    "5": ("Other", "other"),
+    "1": ("Python (ML / Data Science)", "python_ml"),
+    "2": ("Python (Earth Science / Geospatial)", "python_geo"),
+    "3": ("Python (Spatial Web App)", "python_web"),
+    "4": ("Python (General)", "python"),
 }
 
 ARCHITECTURE_PATTERNS = {
-    "1": ("Monolithic Application", "monolithic"),
-    "2": ("Data Pipeline", "pipeline"),
-    "3": ("Microservices / Modular", "microservices"),
+    "1": ("Data Pipeline", "pipeline"),
+    "2": ("ML Research Project", "ml_research"),
+    "3": ("Spatial Web Application", "spatial_web"),
+    "4": ("CLI Tool", "cli"),
+}
+
+# Domain-specific blind spots for the Critical Engagement Protocol
+DOMAIN_BLIND_SPOTS = {
+    "python_ml": """    - **Under-invest**: error handling, input validation, logging, reproducibility (seeds, versions), experiment tracking
+    - **Over-invest**: premature abstraction, configurability nobody will use, class hierarchies where functions suffice
+    - **Misjudge**: dependency choices (pinning vs ranges), state management, test strategy (data fixtures), naming conventions""",
+    "python_geo": """    - **Under-invest**: CRS validation, coordinate system consistency, error handling for corrupt rasters, reproducibility (seeds, library versions, GDAL config)
+    - **Over-invest**: premature abstraction, generic spatial frameworks when a simple script suffices, class hierarchies for one-off analyses
+    - **Misjudge**: dependency choices (GDAL version conflicts), memory management for large rasters, test strategy for geospatial data, data pipeline ordering""",
+    "python_web": """    - **Under-invest**: input validation, error handling, deployment configuration, caching for expensive computations, logging
+    - **Over-invest**: premature optimization, complex state management for simple dashboards, unnecessary client-side logic
+    - **Misjudge**: dependency choices (framework selection), session management, test strategy for interactive visualizations""",
+    "python": """    - **Under-invest**: error handling, input validation, logging, reproducibility (seeds, versions)
+    - **Over-invest**: premature abstraction, configurability nobody will use, class hierarchies where functions suffice
+    - **Misjudge**: dependency choices, state management, test strategy, naming conventions""",
 }
 
 DEFAULT_COMMANDS = {
@@ -59,57 +74,44 @@ DEFAULT_COMMANDS = {
         "TYPE_CHECK_COMMAND": "pyright",
         "BUILD_COMMAND": "pip install build && python -m build",
     },
-    "javascript": {
-        "ENVIRONMENT_ACTIVATION": "# Node.js environment (nvm use if needed)",
-        "INSTALL_COMMAND": "npm install",
-        "VERIFY_COMMAND": "node --version && npm --version",
-        "RUN_COMMAND": "npm start",
-        "TEST_COMMAND": "npm test",
-        "TEST_SINGLE_COMMAND": "npm test -- --testPathPattern=module.test",
-        "TEST_COVERAGE_COMMAND": "npm test -- --coverage",
-        "FORMAT_COMMAND": "npx prettier --write .",
-        "LINT_COMMAND": "npx eslint .",
-        "TYPE_CHECK_COMMAND": "npx tsc --noEmit",
-        "BUILD_COMMAND": "npm run build",
+    "python_ml": {
+        "ENVIRONMENT_ACTIVATION": "conda activate myenv  # or: source .venv/bin/activate",
+        "INSTALL_COMMAND": "pip install -e '.[dev,ml]'",
+        "VERIFY_COMMAND": "python --version && pip list | grep -E 'numpy|pandas|scikit|torch|xgboost'",
+        "RUN_COMMAND": "python -m {{PROJECT_SLUG}}.train",
+        "TEST_COMMAND": "pytest tests/ -v",
+        "TEST_SINGLE_COMMAND": "pytest tests/test_model.py -v",
+        "TEST_COVERAGE_COMMAND": "pytest tests/ --cov={{PROJECT_SLUG}} --cov-report=html",
+        "FORMAT_COMMAND": "ruff format .",
+        "LINT_COMMAND": "ruff check .",
+        "TYPE_CHECK_COMMAND": "pyright",
+        "BUILD_COMMAND": "pip install build && python -m build",
     },
-    "rust": {
-        "ENVIRONMENT_ACTIVATION": "# Rust environment (rustup default stable)",
-        "INSTALL_COMMAND": "cargo build",
-        "VERIFY_COMMAND": "rustc --version && cargo --version",
-        "RUN_COMMAND": "cargo run",
-        "TEST_COMMAND": "cargo test",
-        "TEST_SINGLE_COMMAND": "cargo test test_name",
-        "TEST_COVERAGE_COMMAND": "cargo tarpaulin",
-        "FORMAT_COMMAND": "cargo fmt",
-        "LINT_COMMAND": "cargo clippy",
-        "TYPE_CHECK_COMMAND": "cargo check",
-        "BUILD_COMMAND": "cargo build --release",
+    "python_geo": {
+        "ENVIRONMENT_ACTIVATION": "conda activate myenv  # conda required for GDAL/geospatial",
+        "INSTALL_COMMAND": "pip install -e '.[dev,geo]'",
+        "VERIFY_COMMAND": "python -c \"import rasterio; import geopandas; print('OK')\" && gdalinfo --version",
+        "RUN_COMMAND": "python -m {{PROJECT_SLUG}}.pipeline",
+        "TEST_COMMAND": "pytest tests/ -v",
+        "TEST_SINGLE_COMMAND": "pytest tests/test_pipeline.py -v",
+        "TEST_COVERAGE_COMMAND": "pytest tests/ --cov={{PROJECT_SLUG}} --cov-report=html",
+        "FORMAT_COMMAND": "ruff format .",
+        "LINT_COMMAND": "ruff check .",
+        "TYPE_CHECK_COMMAND": "pyright",
+        "BUILD_COMMAND": "pip install build && python -m build",
     },
-    "go": {
-        "ENVIRONMENT_ACTIVATION": "# Go environment (go version)",
-        "INSTALL_COMMAND": "go mod download",
-        "VERIFY_COMMAND": "go version",
-        "RUN_COMMAND": "go run .",
-        "TEST_COMMAND": "go test ./...",
-        "TEST_SINGLE_COMMAND": "go test -run TestName ./...",
-        "TEST_COVERAGE_COMMAND": "go test -cover ./...",
-        "FORMAT_COMMAND": "gofmt -w .",
-        "LINT_COMMAND": "golangci-lint run",
-        "TYPE_CHECK_COMMAND": "go vet ./...",
-        "BUILD_COMMAND": "go build -o bin/app .",
-    },
-    "other": {
-        "ENVIRONMENT_ACTIVATION": "# Activate your environment",
-        "INSTALL_COMMAND": "# Install dependencies",
-        "VERIFY_COMMAND": "# Verify installation",
-        "RUN_COMMAND": "# Run application",
-        "TEST_COMMAND": "# Run tests",
-        "TEST_SINGLE_COMMAND": "# Run single test",
-        "TEST_COVERAGE_COMMAND": "# Run tests with coverage",
-        "FORMAT_COMMAND": "# Format code",
-        "LINT_COMMAND": "# Lint code",
-        "TYPE_CHECK_COMMAND": "# Type check",
-        "BUILD_COMMAND": "# Build project",
+    "python_web": {
+        "ENVIRONMENT_ACTIVATION": "conda activate myenv  # or: source .venv/bin/activate",
+        "INSTALL_COMMAND": "pip install -e '.[dev,web]'",
+        "VERIFY_COMMAND": "python --version && pip list | grep -E 'streamlit|panel|dash|folium'",
+        "RUN_COMMAND": "streamlit run src/{{PROJECT_SLUG}}/app.py  # or: panel serve src/{{PROJECT_SLUG}}/app.py",
+        "TEST_COMMAND": "pytest tests/ -v",
+        "TEST_SINGLE_COMMAND": "pytest tests/test_app.py -v",
+        "TEST_COVERAGE_COMMAND": "pytest tests/ --cov={{PROJECT_SLUG}} --cov-report=html",
+        "FORMAT_COMMAND": "ruff format .",
+        "LINT_COMMAND": "ruff check .",
+        "TYPE_CHECK_COMMAND": "pyright",
+        "BUILD_COMMAND": "pip install build && python -m build",
     },
 }
 
@@ -187,7 +189,7 @@ def copy_static_files(template_dir: Path, target_dir: Path) -> None:
 
     if claude_src.exists():
         shutil.copytree(claude_src, claude_dst, dirs_exist_ok=True)
-        print(f"  Copied .claude/ directory")
+        print("  Copied .claude/ directory")
 
     # Copy docs/00_MASTER_INDEX.md (it's already generic)
     master_index_src = template_dir / "docs" / "00_MASTER_INDEX.md"
@@ -195,7 +197,7 @@ def copy_static_files(template_dir: Path, target_dir: Path) -> None:
 
     if master_index_src.exists():
         shutil.copy2(master_index_src, master_index_dst)
-        print(f"  Copied docs/00_MASTER_INDEX.md")
+        print("  Copied docs/00_MASTER_INDEX.md")
 
 
 def process_template(
@@ -213,7 +215,7 @@ def process_template(
     print(f"  Created {output_path.relative_to(output_path.parent.parent)}")
 
 
-def create_directory_structure(target_dir: Path, project_slug: str) -> None:
+def create_directory_structure(target_dir: Path, project_slug: str, arch_key: str) -> None:
     """Create the project directory structure."""
     directories = [
         "docs/logs",
@@ -223,6 +225,7 @@ def create_directory_structure(target_dir: Path, project_slug: str) -> None:
         "tests",
         "scripts",
         "configs",
+        "notebooks",
         ".claude/commands",
         ".claude/skills",
         ".claude/agents",
@@ -230,6 +233,24 @@ def create_directory_structure(target_dir: Path, project_slug: str) -> None:
         ".claude/hooks",
         ".claude/mcp",
     ]
+
+    # Add architecture-specific directories
+    if arch_key in ("pipeline", "ml_research"):
+        directories.extend([
+            "data/raw",
+            "data/processed",
+            "data/output",
+        ])
+    if arch_key == "ml_research":
+        directories.extend([
+            "models",
+            "experiments",
+        ])
+    if arch_key == "spatial_web":
+        directories.extend([
+            "data/raw",
+            "data/processed",
+        ])
 
     for dir_path in directories:
         (target_dir / dir_path).mkdir(parents=True, exist_ok=True)
@@ -241,7 +262,7 @@ def create_directory_structure(target_dir: Path, project_slug: str) -> None:
     # Create .gitkeep for empty directories
     (target_dir / "docs/adrs/.gitkeep").touch()
 
-    print(f"  Created directory structure")
+    print("  Created directory structure")
 
 
 def init_git(target_dir: Path) -> bool:
@@ -305,12 +326,35 @@ Thumbs.db
 *.log
 .env.local
 .env.*.local
+
+# Data (large files — track with DVC or git-lfs if needed)
+data/raw/
+data/processed/
+data/output/
+*.tif
+*.nc
+*.hdf5
+*.h5
+*.parquet
+*.feather
+
+# Models
+models/*.pkl
+models/*.joblib
+models/*.pt
+models/*.h5
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Geospatial
+*.shp.lock
 """
         (target_dir / ".gitignore").write_text(gitignore_content)
-        print(f"  Initialized git repository")
+        print("  Initialized git repository")
         return True
     except (subprocess.CalledProcessError, FileNotFoundError):
-        print(f"  Warning: Could not initialize git (git not found or error)")
+        print("  Warning: Could not initialize git (git not found or error)")
         return False
 
 
@@ -322,16 +366,16 @@ def run_wizard(args: argparse.Namespace) -> dict[str, Any]:
     """Run the interactive wizard to collect project information."""
     print_header("Agentic State Protocol v3.0 - Project Initializer")
 
-    print("This wizard will help you set up a new project with the")
-    print("Agentic State Protocol for disciplined AI-assisted development.")
+    print("This wizard will help you set up a new Python project for")
+    print("ML, data science, or earth science with the Agentic State Protocol.")
 
     config: dict[str, Any] = {}
-    total_steps = 7
+    total_steps = 8
 
     # Step 1: Project Name
     print_step(1, total_steps, "Project Name")
     config["project_name"] = args.name or prompt(
-        "Enter project name (e.g., 'My Awesome Project')"
+        "Enter project name (e.g., 'Watershed Analysis Pipeline')"
     )
     config["project_slug"] = slugify(config["project_name"])
     print(f"  Slug: {config['project_slug']}")
@@ -344,9 +388,9 @@ def run_wizard(args: argparse.Namespace) -> dict[str, Any]:
     )
 
     # Step 3: Tech Stack
-    print_step(3, total_steps, "Tech Stack")
+    print_step(3, total_steps, "Python Focus Area")
     stack_label, stack_key = prompt_choice(
-        "Select your primary technology stack:",
+        "Select your primary focus area:",
         TECH_STACKS
     )
     config["tech_stack"] = stack_label
@@ -368,17 +412,25 @@ def run_wizard(args: argparse.Namespace) -> dict[str, Any]:
         "Set up development environment and basic structure"
     )
 
-    # Step 6: Target Directory
-    print_step(6, total_steps, "Target Directory")
+    # Step 6: User Context (for Critical Engagement Protocol)
+    print_step(6, total_steps, "User Context")
+    print("  This helps the AI agent calibrate its feedback style.")
+    config["user_context"] = prompt(
+        "Describe your profile (e.g., 'researcher with expertise in hydrology and ML')",
+        "researcher with domain expertise"
+    )
+
+    # Step 7: Target Directory
+    print_step(7, total_steps, "Target Directory")
     default_dir = Path.cwd() / config["project_slug"]
     target_input = prompt(
-        f"Target directory",
+        "Target directory",
         str(default_dir)
     )
     config["target_dir"] = Path(target_input).resolve()
 
-    # Step 7: Git Initialization
-    print_step(7, total_steps, "Git Repository")
+    # Step 8: Git Initialization
+    print_step(8, total_steps, "Git Repository")
     config["init_git"] = prompt_yes_no("Initialize git repository?", True)
 
     # Optional: Data location
@@ -398,6 +450,7 @@ def create_project(config: dict[str, Any]) -> None:
     target_dir = config["target_dir"]
     project_slug = config["project_slug"]
     tech_key = config["tech_key"]
+    arch_key = config["architecture_key"]
 
     print_header("Creating Project")
 
@@ -413,7 +466,7 @@ def create_project(config: dict[str, Any]) -> None:
     # Create directory structure
     print("\n1. Creating directory structure...")
     target_dir.mkdir(parents=True, exist_ok=True)
-    create_directory_structure(target_dir, project_slug)
+    create_directory_structure(target_dir, project_slug, arch_key)
 
     # Copy static files
     print("\n2. Copying static files...")
@@ -421,7 +474,7 @@ def create_project(config: dict[str, Any]) -> None:
 
     # Prepare replacements
     today = date.today().isoformat()
-    commands = DEFAULT_COMMANDS.get(tech_key, DEFAULT_COMMANDS["other"])
+    commands = DEFAULT_COMMANDS.get(tech_key, DEFAULT_COMMANDS["python"]).copy()
 
     # Replace PROJECT_SLUG in commands
     for key, value in commands.items():
@@ -454,6 +507,18 @@ def create_project(config: dict[str, Any]) -> None:
 {commands['TYPE_CHECK_COMMAND']}
 ```"""
 
+    # Build user context for Critical Engagement Protocol
+    user_context_text = (
+        f"**Context:** The user is a {config['user_context']}. "
+        "The agent should calibrate feedback to the user's expertise level."
+    )
+
+    # Get domain-specific blind spots
+    blind_spots = DOMAIN_BLIND_SPOTS.get(
+        tech_key,
+        DOMAIN_BLIND_SPOTS["python"]
+    )
+
     replacements = {
         "PROJECT_NAME": config["project_name"],
         "PROJECT_SLUG": project_slug,
@@ -466,6 +531,8 @@ def create_project(config: dict[str, Any]) -> None:
         "REPO_URL": "https://github.com/username/repo.git",
         "DATA_LOCATION": config.get("data_location") or "N/A",
         "COMMON_TASKS": common_tasks,
+        "USER_CONTEXT": user_context_text,
+        "DOMAIN_BLIND_SPOTS": blind_spots,
         **commands,
     }
 
@@ -501,7 +568,7 @@ def create_project(config: dict[str, Any]) -> None:
 
     print(f"Project: {config['project_name']}")
     print(f"Location: {target_dir}")
-    print(f"Tech Stack: {config['tech_stack']}")
+    print(f"Focus Area: {config['tech_stack']}")
     print(f"Architecture: {config['architecture_pattern']}")
 
     print("\n" + "=" * 60)
@@ -535,7 +602,7 @@ def create_project(config: dict[str, Any]) -> None:
 def main() -> None:
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="Initialize a new project with Agentic State Protocol v3.0"
+        description="Initialize a new Python project with Agentic State Protocol v3.0"
     )
     parser.add_argument(
         "--name",

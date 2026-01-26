@@ -78,39 +78,17 @@ test_run = "pytest -v"
 lint_check = "ruff check ."
 type_check = "mypy . || pyright"
 security_check = "pip-audit"
+format_check = "ruff format --check ."
 ```
 
-### JavaScript/TypeScript Project
+### Conda Environment Verification
 
-```javascript
-// Verification commands
-build_check = "npm run build"
-test_run = "npm test"
-lint_check = "npm run lint"
-type_check = "npx tsc --noEmit"  // TypeScript only
-security_check = "npm audit"
-```
-
-### Rust Project
-
-```rust
-// Verification commands
-build_check = "cargo build"
-test_run = "cargo test"
-lint_check = "cargo clippy -- -D warnings"
-format_check = "cargo fmt --check"
-security_check = "cargo audit"
-```
-
-### Go Project
-
-```go
-// Verification commands
-build_check = "go build ./..."
-test_run = "go test ./..."
-lint_check = "golangci-lint run"
-format_check = "gofmt -l ."
-security_check = "govulncheck ./..."
+```python
+# Verify conda environment is active and correct
+env_check = "conda info --envs"
+env_packages = "conda list"
+# Verify geospatial dependencies are importable
+geo_check = "python -c 'import rasterio; import geopandas; import xarray'"
 ```
 
 ---

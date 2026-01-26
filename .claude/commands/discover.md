@@ -29,7 +29,7 @@ Scanning project structure...
 Tech Stack:
 - Primary Language: [detected from manifests/files]
 - Frameworks: [detected from dependencies]
-- Package Manager: [pip/npm/cargo/go mod]
+- Package Manager: [pip/conda/mamba]
 
 Project Structure:
 - Has Tests: [yes/no]
@@ -87,7 +87,7 @@ Last Updated: [timestamp or N/A]
 
 [If stale/missing]:
 Fetching fresh data via CLI...
-Command: npx claude-plugins search --json --limit 500
+Command: pip search claude-plugins --limit 500
 
 Registry Stats:
 - Total Plugins: 10,620+
@@ -133,7 +133,7 @@ Why recommended:
 Addresses:
 - [Gap or issue it resolves]
 
-→ npx claude-plugins install @owner/repo/skill-name
+→ pip install claude-plugins-skill-name
 
 ---
 
@@ -167,7 +167,7 @@ If user approves installation:
 INSTALLING SKILL
 ══════════════════════════════════════════════════════════════
 
-Running: npx claude-plugins install @owner/repo/skill-name
+Running: pip install claude-plugins-skill-name
 
 [Installation output]
 
@@ -244,7 +244,7 @@ Can be configured to run automatically:
 | Error | Recovery |
 |-------|----------|
 | Registry unreachable | Use cached data or static fallback list |
-| CLI not installed | Prompt user to install: `npm install -g claude-plugins` |
+| CLI not installed | Prompt user to install: `pip install claude-plugins` |
 | No matching skills | Suggest broadening search or manual registry browse |
 | Installation fails | Show error, suggest manual installation steps |
 | Conflict detected | Warn user, require explicit override |

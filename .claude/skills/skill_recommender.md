@@ -31,11 +31,9 @@ Priority 1 - Manifest Files (highest confidence):
 ├─────────────────────┼────────────────┼─────────────┤
 │ pyproject.toml      │ Python         │ High        │
 │ requirements.txt    │ Python         │ High        │
-│ package.json        │ JavaScript/TS  │ High        │
-│ Cargo.toml          │ Rust           │ High        │
-│ go.mod              │ Go             │ High        │
-│ pom.xml             │ Java           │ High        │
-│ build.gradle        │ Java/Kotlin    │ High        │
+│ setup.py            │ Python         │ High        │
+│ Pipfile             │ Python         │ High        │
+│ environment.yml     │ Python (conda) │ High        │
 └─────────────────────┴────────────────┴─────────────┘
 
 Priority 2 - File Extension Analysis:
@@ -52,19 +50,19 @@ Priority 3 - Documentation Analysis:
 Priority 4 - Framework Detection:
 - Parse dependency files for known frameworks
 - Check for framework config files:
-  - next.config.js → Next.js
-  - vite.config.ts → Vite
   - django/settings.py → Django
   - fastapi patterns → FastAPI
+  - conftest.py → pytest
+  - marimo notebooks → marimo
 ```
 
 **Detection Output Structure**:
 ```python
 ProjectContext(
-    primary_language: str,           # "python", "javascript", "rust", "go"
+    primary_language: str,           # "python"
     secondary_languages: list[str],  # Other detected languages
-    frameworks: list[str],           # ["fastapi", "sqlalchemy", "pydantic"]
-    package_manager: str,            # "pip", "npm", "cargo", "go"
+    frameworks: list[str],           # ["fastapi", "sqlalchemy", "pydantic", "xarray"]
+    package_manager: str,            # "pip", "conda", "mamba"
 
     has_tests: bool,                 # tests/ or *_test.* exist
     has_docs: bool,                  # docs/ exists
@@ -96,32 +94,11 @@ Python:
 ├── formatting (black, ruff format)
 ├── security (bandit, safety)
 ├── documentation (sphinx, mkdocs)
-└── dependency_audit (pip-audit)
-
-JavaScript/TypeScript:
-├── testing (jest, vitest, mocha)
-├── linting (eslint, biome)
-├── type_checking (typescript)
-├── formatting (prettier, biome)
-├── security (npm audit, snyk)
-├── bundling (webpack, vite, esbuild)
-└── documentation (typedoc, jsdoc)
-
-Rust:
-├── testing (cargo test)
-├── linting (clippy)
-├── formatting (rustfmt)
-├── security (cargo audit)
-├── documentation (rustdoc)
-└── benchmarking (criterion)
-
-Go:
-├── testing (go test)
-├── linting (golangci-lint)
-├── formatting (gofmt)
-├── security (gosec)
-├── documentation (godoc)
-└── profiling (pprof)
+├── dependency_audit (pip-audit)
+├── geospatial (rasterio, geopandas, shapely, fiona)
+├── scientific (xarray, numpy, scipy, pandas)
+├── notebooks (marimo, jupyter)
+└── environment (conda, mamba)
 ```
 
 **Gap Detection Algorithm**:

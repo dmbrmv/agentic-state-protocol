@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(ruff:*), Bash(pytest:*), Bash(npm:*), Bash(npx:*), Bash(cargo:*), Bash(go:*), Bash(mypy:*), Bash(pyright:*), Bash(git diff:*), Bash(git status:*)
+allowed-tools: Bash(ruff:*), Bash(pytest:*), Bash(mypy:*), Bash(pyright:*), Bash(git diff:*), Bash(git status:*)
 description: Run all pre-commit checks (lint, format, test, typecheck)
 ---
 
@@ -17,7 +17,7 @@ Current branch:
 !`git branch --show-current`
 
 Project files:
-!`ls -la pyproject.toml package.json Cargo.toml go.mod tsconfig.json .eslintrc* 2>/dev/null | head -10 || echo "Unknown"`
+!`ls -la pyproject.toml setup.cfg setup.py 2>/dev/null | head -10 || echo "Unknown"`
 
 ## Task
 
@@ -29,27 +29,15 @@ Run all applicable checks for the detected project type:
 
 #### 1. Format Check (no modifications)
 - Python: `ruff format --check .`
-- JavaScript: `npx prettier --check .`
-- Rust: `cargo fmt --check`
-- Go: `gofmt -l .`
 
 #### 2. Lint Check
 - Python: `ruff check .`
-- JavaScript: `npx eslint .`
-- Rust: `cargo clippy -- -D warnings`
-- Go: `golangci-lint run`
 
 #### 3. Type Check
 - Python: `mypy .` or `pyright`
-- TypeScript: `npx tsc --noEmit`
-- Rust: (included in cargo build)
-- Go: (included in go build)
 
 #### 4. Test Check (affected tests only if possible)
 - Python: `pytest -x --tb=short`
-- JavaScript: `npm test`
-- Rust: `cargo test`
-- Go: `go test ./...`
 
 ### Execution Order
 

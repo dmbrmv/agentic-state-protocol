@@ -7,14 +7,12 @@ argument-hint: [url-or-action]
 
 ## Pre-computed Context
 
-Package.json scripts:
-!`cat package.json 2>/dev/null | grep -A 20 '"scripts"' | head -25 || echo "No package.json"`
-
-Framework detection:
-!`cat package.json 2>/dev/null | grep -E '"(react|vue|angular|svelte|next|nuxt)"' | head -5 || echo "Unknown framework"`
+Python web framework detection:
+!`ls app.py main.py server.py dashboard.py 2>/dev/null | head -5 || echo "No app entry point found"`
+!`grep -rl "streamlit\|dash\|panel\|flask\|fastapi" *.py 2>/dev/null | head -5 || echo "No Python web framework detected"`
 
 Current dev server:
-!`lsof -i :3000,:5173,:8080,:4200 2>/dev/null | grep LISTEN | head -3 || echo "No dev server detected"`
+!`lsof -i :8501,:5006,:8050,:8000,:5000 2>/dev/null | grep LISTEN | head -3 || echo "No dev server detected"`
 
 ## Task
 
@@ -32,13 +30,11 @@ Test web application in Chrome browser.
 
 | Framework | Command | URL |
 |-----------|---------|-----|
-| React (CRA) | `npm start` | http://localhost:3000 |
-| React (Vite) | `npm run dev` | http://localhost:5173 |
-| Next.js | `npm run dev` | http://localhost:3000 |
-| Vue (Vite) | `npm run dev` | http://localhost:5173 |
-| Vue (CLI) | `npm run serve` | http://localhost:8080 |
-| Angular | `ng serve` | http://localhost:4200 |
-| Svelte | `npm run dev` | http://localhost:5173 |
+| Streamlit | `streamlit run app.py` | http://localhost:8501 |
+| Panel | `panel serve app.py` | http://localhost:5006 |
+| Dash | `python app.py` | http://localhost:8050 |
+| FastAPI | `uvicorn main:app --reload` | http://localhost:8000 |
+| Flask | `python app.py` | http://localhost:5000 |
 
 ### Testing Actions
 
@@ -126,10 +122,10 @@ If Chrome extension not available:
 4. Report findings back
 
 ```bash
-# Start dev server
-npm run dev
+# Start dev server (example: Streamlit)
+streamlit run app.py
 
 # Open in browser
-open http://localhost:5173  # macOS
-xdg-open http://localhost:5173  # Linux
+open http://localhost:8501  # macOS
+xdg-open http://localhost:8501  # Linux
 ```

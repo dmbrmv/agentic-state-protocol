@@ -105,7 +105,7 @@ Quick read-only dashboard showing project health at a glance. Aggregates informa
 | Branch info | `git branch -vv` | Ahead/behind tracking |
 | Test results | Cached from last `/test` | Pass/fail counts |
 | Doc sync | Compare timestamps | Modified after last update |
-| Dependencies | `pip-audit`, `npm audit` | Vulnerability count |
+| Dependencies | `pip-audit` | Vulnerability count |
 | Issues | Parse `docs/02_issues.md` | Count by severity |
 
 ## Documentation Sync Detection

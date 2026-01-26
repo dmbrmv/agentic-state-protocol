@@ -19,32 +19,6 @@ Detected by: `pyproject.toml`, `requirements.txt`, or `setup.py`
 | ruff | Linting | Error (blocks) |
 | mypy | Type checking | Warning (allows) |
 
-### JavaScript/TypeScript Projects
-
-Detected by: `package.json`
-
-| Tool | Check | Severity |
-|------|-------|----------|
-| eslint | Linting | Error (blocks) |
-| tsc | Type checking | Error (blocks) |
-
-### Rust Projects
-
-Detected by: `Cargo.toml`
-
-| Tool | Check | Severity |
-|------|-------|----------|
-| clippy | Linting with `-D warnings` | Error (blocks) |
-
-### Go Projects
-
-Detected by: `go.mod`
-
-| Tool | Check | Severity |
-|------|-------|----------|
-| go vet | Code analysis | Error (blocks) |
-| golangci-lint | Comprehensive linting | Warning (allows) |
-
 ## Configuration
 
 Add to `.claude/settings.json`:
@@ -86,7 +60,7 @@ Add to `.claude/settings.json`:
 ## Requirements
 
 - jq (for JSON parsing)
-- Language-specific tools must be installed (ruff, eslint, clippy, etc.)
+- Python tools must be installed (ruff, mypy)
 
 ## See Also
 

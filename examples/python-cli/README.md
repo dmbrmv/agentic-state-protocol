@@ -5,7 +5,7 @@ This example shows how to set up a Python CLI project with the Agentic State Pro
 ## Project Type
 - **Architecture**: Monolithic Application
 - **Tech Stack**: Python
-- **Use Case**: Command-line tools, scripts, utilities
+- **Use Case**: Earth science CLI tools, data processing utilities, geospatial workflows
 
 ## Initialization
 

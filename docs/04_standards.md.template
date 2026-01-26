@@ -11,12 +11,13 @@
 2. **Readability over cleverness** - Code is read more than written
 3. **Explicit over implicit** - Make intentions clear
 4. **Test what matters** - Critical paths need tests
+5. **Reproducibility is non-negotiable** - Every result must be reproducible
 
 ---
 
-## II. Language-Specific Standards
+## II. Python Standards
 
-### Python
+### Core Conventions
 
 **Formatter**: `ruff format` (or `black`)
 **Linter**: `ruff check` (or `flake8`)
@@ -71,7 +72,7 @@ DEFAULT_TIMEOUT = 30
 API_BASE_URL = "https://api.example.com"
 ```
 
-**Docstrings**: Google format
+**Docstrings**: Google format (preferred) or NumPy format for scientific code
 ```python
 def function(arg1: str, arg2: int) -> bool:
     """Short description.
@@ -94,232 +95,308 @@ def function(arg1: str, arg2: int) -> bool:
     """
 ```
 
----
+### Scientific Computing
 
-### JavaScript / TypeScript
+**NumPy Docstrings** (for array-heavy functions):
+```python
+def compute_flow(
+    precipitation: np.ndarray,
+    area_km2: float,
+    timestep_hours: float = 1.0,
+) -> np.ndarray:
+    """Compute streamflow from precipitation using unit hydrograph.
 
-**Formatter**: `prettier`
-**Linter**: `eslint`
-**Type Checker**: `tsc` (strict mode)
-**Line Length**: 100 characters
+    Parameters
+    ----------
+    precipitation : np.ndarray
+        Precipitation time series in mm. Shape: (n_timesteps,).
+    area_km2 : float
+        Catchment area in square kilometers. Must be positive.
+    timestep_hours : float, optional
+        Time step duration in hours. Default is 1.0.
 
-```typescript
-// Imports: external, internal, relative (separated)
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+    Returns
+    -------
+    np.ndarray
+        Streamflow time series in m3/s. Shape: (n_timesteps,).
 
-import { ApiClient } from '@/lib/api';
-import { formatDate } from '@/utils/date';
+    Raises
+    ------
+    ValueError
+        If precipitation contains negative values or area_km2 <= 0.
 
-import { Button } from './Button';
+    Notes
+    -----
+    Uses the SCS curve number method. Reference: USDA-SCS (1972).
 
-
-// Interfaces: PascalCase with I prefix (optional)
-interface UserData {
-  id: string;
-  name: string;
-  email: string;
-}
-
-// Types: PascalCase
-type ApiResponse<T> = {
-  data: T;
-  error?: string;
-};
-
-// Functions: camelCase
-function processData(input: string): UserData {
-  // ...
-}
-
-// Arrow functions for callbacks
-const handleClick = (event: MouseEvent) => {
-  // ...
-};
-
-// Constants: UPPER_SNAKE_CASE or camelCase for config
-const MAX_RETRIES = 3;
-const apiBaseUrl = process.env.API_URL;
-
-// Classes: PascalCase
-class DataProcessor {
-  private config: Record<string, unknown>;
-
-  constructor(config: Record<string, unknown>) {
-    this.config = config;
-  }
-
-  public async process(): Promise<void> {
-    // ...
-  }
-}
+    Examples
+    --------
+    >>> precip = np.array([0.0, 5.2, 12.1, 3.4])
+    >>> flow = compute_flow(precip, area_km2=150.0)
+    >>> flow.shape
+    (4,)
+    """
 ```
 
-**JSDoc** (for JavaScript):
-```javascript
-/**
- * Process user data.
- * @param {string} userId - The user ID.
- * @param {Object} options - Processing options.
- * @param {boolean} [options.validate=true] - Whether to validate.
- * @returns {Promise<UserData>} Processed user data.
- * @throws {Error} If user not found.
- */
-async function processUser(userId, options = {}) {
-  // ...
-}
+**Array Shape Documentation**: Always document array shapes in docstrings and use comments for intermediate shapes:
+```python
+# Shape: (n_stations, n_timesteps)
+obs_data = np.zeros((n_stations, n_timesteps))
+
+# Shape: (n_lat, n_lon) -> (n_cells,)
+flat_grid = grid_data.ravel()
 ```
 
----
+**xarray Conventions**:
+```python
+import xarray as xr
 
-### Rust
-
-**Formatter**: `rustfmt`
-**Linter**: `clippy`
-**Line Length**: 100 characters
-
-```rust
-// Imports: std, external, crate (separated)
-use std::collections::HashMap;
-use std::path::Path;
-
-use serde::{Deserialize, Serialize};
-use tokio::fs;
-
-use crate::config::Config;
-use crate::utils::format_date;
-
-
-// Structs: PascalCase
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct UserData {
-    pub id: String,
-    pub name: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-}
-
-// Enums: PascalCase, variants PascalCase
-pub enum Status {
-    Active,
-    Inactive,
-    Pending { reason: String },
-}
-
-// Constants: UPPER_SNAKE_CASE
-pub const MAX_RETRIES: u32 = 3;
-const DEFAULT_TIMEOUT: u64 = 30;
-
-// Functions: snake_case
-pub fn process_data(input: &str) -> Result<UserData, Error> {
-    // ...
-}
-
-// Traits: PascalCase
-pub trait Processor {
-    fn process(&self) -> Result<(), Error>;
-}
-
-impl Processor for DataHandler {
-    fn process(&self) -> Result<(), Error> {
-        // ...
-    }
-}
-```
-
-**Documentation**:
-```rust
-/// Process user data from input.
-///
-/// # Arguments
-///
-/// * `input` - The input string to process.
-/// * `config` - Processing configuration.
-///
-/// # Returns
-///
-/// Processed user data or error.
-///
-/// # Errors
-///
-/// Returns error if input is invalid.
-///
-/// # Examples
-///
-/// ```
-/// let result = process_data("test", &config)?;
-/// assert!(result.is_valid());
-/// ```
-pub fn process_data(input: &str, config: &Config) -> Result<UserData, Error> {
-    // ...
-}
-```
-
----
-
-### Go
-
-**Formatter**: `gofmt`
-**Linter**: `golangci-lint`
-**Line Length**: 120 characters
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "time"
-
-    "github.com/pkg/errors"
-
-    "myproject/internal/config"
-    "myproject/pkg/utils"
+# Use meaningful dimension names
+ds = xr.Dataset(
+    {
+        "temperature": (["time", "lat", "lon"], temp_array),
+        "precipitation": (["time", "lat", "lon"], precip_array),
+    },
+    coords={
+        "time": pd.date_range("2020-01-01", periods=365),
+        "lat": lat_values,
+        "lon": lon_values,
+    },
+    attrs={
+        "source": "ERA5 reanalysis",
+        "units": "K for temperature, mm for precipitation",
+        "created": str(datetime.now()),
+    },
 )
 
-// Constants: camelCase (unexported) or PascalCase (exported)
-const (
-    maxRetries     = 3
-    DefaultTimeout = 30 * time.Second
+# Always include units in attrs
+ds["temperature"].attrs["units"] = "K"
+ds["precipitation"].attrs["units"] = "mm/day"
+```
+
+### Data Pipeline Conventions
+
+**Pandas Best Practices**:
+```python
+# Use method chaining for transformations
+result = (
+    df
+    .query("quality_flag == 'valid'")
+    .assign(
+        date=lambda x: pd.to_datetime(x["date_str"]),
+        flow_cms=lambda x: x["flow_cfs"] * 0.0283168,
+    )
+    .set_index("date")
+    .resample("D")
+    .mean()
 )
 
-// UserData represents a user's information.
-type UserData struct {
-    ID    string `json:"id"`
-    Name  string `json:"name"`
-    Email string `json:"email,omitempty"`
-}
-
-// Processor defines the processing interface.
-type Processor interface {
-    Process(ctx context.Context) error
-}
-
-// DataHandler handles data processing.
-type DataHandler struct {
-    config *config.Config
-}
-
-// NewDataHandler creates a new DataHandler.
-func NewDataHandler(cfg *config.Config) *DataHandler {
-    return &DataHandler{config: cfg}
-}
-
-// Process processes the data.
-func (h *DataHandler) Process(ctx context.Context) error {
-    // ...
-    return nil
-}
-
-// processData is an unexported helper function.
-func processData(input string) (*UserData, error) {
-    if input == "" {
-        return nil, errors.New("input cannot be empty")
-    }
-    // ...
-    return &UserData{}, nil
-}
+# Explicit dtypes on read
+df = pd.read_csv(
+    path,
+    dtype={"station_id": str, "value": float},
+    parse_dates=["date"],
+)
 ```
+
+**Data Validation**:
+```python
+# Validate inputs at pipeline boundaries
+def load_station_data(path: Path) -> pd.DataFrame:
+    """Load and validate station data."""
+    df = pd.read_csv(path)
+
+    # Validate schema
+    required_cols = {"station_id", "date", "value", "quality_flag"}
+    missing = required_cols - set(df.columns)
+    if missing:
+        raise ValueError(f"Missing required columns: {missing}")
+
+    # Validate data ranges
+    if (df["value"] < 0).any():
+        n_neg = (df["value"] < 0).sum()
+        raise ValueError(f"Found {n_neg} negative values in 'value' column")
+
+    # Validate no duplicates
+    dupes = df.duplicated(subset=["station_id", "date"])
+    if dupes.any():
+        raise ValueError(f"Found {dupes.sum()} duplicate station-date records")
+
+    return df
+```
+
+**Pipeline Stage Pattern**:
+```python
+def stage_name(input_path: Path, output_path: Path, *, overwrite: bool = False) -> Path:
+    """Pipeline stage: brief description.
+
+    Args:
+        input_path: Path to input data.
+        output_path: Path for output data.
+        overwrite: If True, overwrite existing output.
+
+    Returns:
+        Path to output file.
+
+    Raises:
+        FileExistsError: If output exists and overwrite is False.
+        ValueError: If input data fails validation.
+    """
+    if output_path.exists() and not overwrite:
+        raise FileExistsError(f"Output exists: {output_path}")
+
+    # Load and validate input
+    data = load_and_validate(input_path)
+
+    # Process
+    result = transform(data)
+
+    # Validate output
+    validate_output(result)
+
+    # Write
+    result.to_parquet(output_path)
+    return output_path
+```
+
+### Earth Science / Geospatial
+
+**CRS Handling**:
+```python
+import rasterio
+from pyproj import CRS
+
+# Always be explicit about CRS
+TARGET_CRS = CRS.from_epsg(4326)  # WGS84
+
+# Validate CRS on load
+with rasterio.open(dem_path) as src:
+    if src.crs is None:
+        raise ValueError(f"No CRS defined for {dem_path}")
+    if src.crs != TARGET_CRS:
+        logger.warning(f"CRS mismatch: {src.crs} != {TARGET_CRS}, reprojecting")
+```
+
+**GeoPandas Conventions**:
+```python
+import geopandas as gpd
+
+# Always check and set CRS explicitly
+gdf = gpd.read_file(shapefile_path)
+if gdf.crs is None:
+    raise ValueError(f"No CRS in {shapefile_path}")
+
+# Reproject before spatial operations between datasets
+gdf_proj = gdf.to_crs(epsg=32637)  # UTM zone for area calculations
+
+# Document coordinate units
+# Area in m2 (UTM projection)
+gdf_proj["area_m2"] = gdf_proj.geometry.area
+# Convert to km2
+gdf_proj["area_km2"] = gdf_proj["area_m2"] / 1e6
+```
+
+**Rasterio Patterns**:
+```python
+# Always use context managers
+with rasterio.open(input_path) as src:
+    data = src.read(1)  # Band 1
+    profile = src.profile.copy()
+    nodata = src.nodata
+
+# Handle nodata explicitly
+if nodata is not None:
+    valid_mask = data != nodata
+    data = np.where(valid_mask, data, np.nan)
+
+# Update profile for output
+profile.update(dtype="float32", compress="lz4", nodata=-9999.0)
+with rasterio.open(output_path, "w", **profile) as dst:
+    dst.write(result, 1)
+```
+
+### ML Conventions
+
+**Reproducibility**:
+```python
+import random
+import numpy as np
+
+RANDOM_SEED = 42
+
+def set_reproducible(seed: int = RANDOM_SEED) -> None:
+    """Set all random seeds for reproducibility."""
+    random.seed(seed)
+    np.random.seed(seed)
+    # Add framework-specific seeds (torch, tf) as needed
+
+# Always log experiment parameters
+logger.info(
+    "Experiment config: seed=%d, n_trials=%d, algorithm=%s",
+    seed, n_trials, algorithm,
+)
+```
+
+**Experiment Tracking**:
+```python
+# Log all hyperparameters, metrics, and artifacts
+# Use structured logging or dedicated tracking (MLflow, Optuna)
+experiment_config = {
+    "algorithm": "NSGA-II",
+    "n_generations": 100,
+    "population_size": 50,
+    "objective": ["NSE", "PBIAS"],
+    "seed": RANDOM_SEED,
+    "timestamp": datetime.now().isoformat(),
+}
+
+# Save config alongside results
+with open(output_dir / "config.json", "w") as f:
+    json.dump(experiment_config, f, indent=2)
+```
+
+**Model Evaluation**:
+```python
+# Always report multiple metrics
+metrics = {
+    "NSE": compute_nse(obs, sim),
+    "KGE": compute_kge(obs, sim),
+    "PBIAS": compute_pbias(obs, sim),
+    "RMSE": compute_rmse(obs, sim),
+    "R2": compute_r2(obs, sim),
+}
+
+# Include confidence intervals or uncertainty where possible
+# Document the evaluation period
+logger.info("Evaluation period: %s to %s", start_date, end_date)
+logger.info("Metrics: %s", metrics)
+```
+
+### Notebook Conventions (Marimo)
+
+**Structure**:
+```python
+# Cell 1: Imports and configuration (always first)
+import marimo as mo
+import numpy as np
+import pandas as pd
+
+# Cell 2: Data loading (separate from processing)
+# Use explicit paths, never relative from notebook location
+DATA_DIR = Path("/mnt/storage/ResearchData/HydroHub")
+
+# Cell 3+: Analysis steps (one concept per cell)
+# Each cell should have a clear purpose documented in a markdown cell above it
+
+# Final cells: Results summary and visualization
+```
+
+**Notebook Rules**:
+1. No side effects between cells (each cell is self-contained given its inputs)
+2. Use `mo.ui` elements for interactive parameters, not hardcoded values
+3. Pin all dependency versions in the notebook header
+4. Include a "Results Summary" cell at the end
+5. Never store large data in notebook state -- load from disk
 
 ---
 
@@ -337,14 +414,17 @@ Format: `<type>(<scope>): <description>`
 - `refactor`: Code restructuring
 - `test`: Adding tests
 - `chore`: Maintenance tasks
+- `perf`: Performance improvement
+- `data`: Data pipeline or data processing changes
 
 **Examples**:
 ```
-feat(auth): add JWT token refresh
-fix(api): handle null response from server
+feat(calibration): add multi-objective optimization with NSGA-II
+fix(pipeline): handle missing nodata values in DEM processing
 docs(readme): update installation instructions
 refactor(core): extract validation logic to separate module
-test(utils): add unit tests for date formatting
+test(diagnostics): add unit tests for NSE calculation
+data(weather): add ERA5 precipitation downscaling stage
 ```
 
 ### Branch Names
@@ -353,101 +433,117 @@ Format: `<type>/<short-description>`
 
 **Examples**:
 ```
-feature/user-authentication
-fix/null-pointer-api
+feature/multi-objective-calibration
+fix/dem-nodata-handling
 docs/update-readme
 refactor/extract-validation
+data/era5-downscaling
 ```
 
 ---
 
 ## IV. Testing Standards
 
-### Test-Driven Development (TDD) Mandate
-
-**STRICT MODE**: All new code must follow TDD methodology.
-
-#### The TDD Cycle
-
-```
-RED -> GREEN -> REFACTOR -> REPEAT
-
-1. RED:      Write a failing test FIRST
-2. GREEN:    Write minimal code to pass
-3. REFACTOR: Improve code, keep tests green
-4. REPEAT:   Next feature/scenario
-```
-
-#### TDD Enforcement
-
-- Tests must be written BEFORE implementation
-- Commits are blocked without corresponding tests
-- Coverage gate: 80% minimum, 100% for critical code
-
 ### Test File Naming
 
-| Language | Pattern |
-|----------|---------|
-| Python | `test_<module>.py` or `<module>_test.py` |
-| JavaScript/TS | `<module>.test.ts` or `<module>.spec.ts` |
-| Rust | `<module>.rs` with `#[cfg(test)]` module |
-| Go | `<module>_test.go` |
+| Pattern | Convention |
+|---------|-----------|
+| `test_<module>.py` | Standard pytest convention (preferred) |
+| `<module>_test.py` | Alternative pytest convention |
+| `conftest.py` | Shared fixtures per directory |
 
 ### Test Structure (AAA Pattern)
 
 ```python
 def test_process_data_returns_valid_result():
-    # Arrange - Set up test data
+    # Arrange
     input_data = {"key": "value"}
     processor = DataProcessor()
 
-    # Act - Execute the code under test
+    # Act
     result = processor.process(input_data)
 
-    # Assert - Verify the outcome
+    # Assert
     assert result.is_valid()
     assert result.key == "value"
 ```
 
+### Scientific Computing Test Patterns
+
+**Tolerance-Based Assertions**:
+```python
+import numpy as np
+from numpy.testing import assert_allclose
+
+def test_nse_perfect_simulation():
+    """NSE should be 1.0 for perfect simulation."""
+    obs = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+    sim = obs.copy()
+    assert_allclose(compute_nse(obs, sim), 1.0, atol=1e-10)
+
+def test_flow_conservation():
+    """Total outflow should equal total inflow (mass balance)."""
+    inflow = np.random.RandomState(42).uniform(0, 100, size=365)
+    outflow = route_flow(inflow, params)
+    assert_allclose(outflow.sum(), inflow.sum(), rtol=0.01)
+```
+
+**Fixture Data**:
+```python
+import pytest
+
+@pytest.fixture
+def sample_hydrograph() -> np.ndarray:
+    """Synthetic hydrograph with known properties."""
+    rng = np.random.RandomState(42)
+    baseflow = 10.0
+    storm = np.concatenate([
+        np.zeros(10),
+        np.linspace(0, 50, 5),
+        np.exp(-np.linspace(0, 3, 20)) * 50,
+        np.zeros(10),
+    ])
+    return baseflow + storm + rng.normal(0, 0.5, len(storm) + 20)
+
+@pytest.fixture
+def sample_dem(tmp_path: Path) -> Path:
+    """Create a synthetic DEM raster for testing."""
+    import rasterio
+    from rasterio.transform import from_bounds
+
+    dem_path = tmp_path / "test_dem.tif"
+    data = np.random.RandomState(42).uniform(100, 500, (100, 100)).astype("float32")
+    transform = from_bounds(44.0, 42.0, 45.0, 43.0, 100, 100)
+    with rasterio.open(
+        dem_path, "w", driver="GTiff", height=100, width=100,
+        count=1, dtype="float32", crs="EPSG:4326", transform=transform,
+    ) as dst:
+        dst.write(data, 1)
+    return dem_path
+```
+
+**Parametrized Tests with Known Solutions**:
+```python
+@pytest.mark.parametrize(
+    "obs, sim, expected_nse",
+    [
+        (np.array([1, 2, 3]), np.array([1, 2, 3]), 1.0),
+        (np.array([1, 2, 3]), np.array([2, 2, 2]), 0.0),  # Mean prediction
+        (np.array([1, 2, 3]), np.array([3, 2, 1]), -3.0),  # Reversed
+    ],
+    ids=["perfect", "mean-only", "reversed"],
+)
+def test_nse_known_solutions(obs, sim, expected_nse):
+    assert_allclose(compute_nse(obs, sim), expected_nse, atol=1e-10)
+```
+
 ### Coverage Requirements
 
-| Type | Minimum | Notes |
-|------|---------|-------|
-| Unit Tests | 80% | All new code |
-| Integration Tests | Critical paths | APIs, DB operations |
-| E2E Tests | Happy paths | User flows |
-
-#### 100% Coverage Required For:
-- Authentication/Authorization logic
-- Financial calculations
-- Security validation functions
-- Core business logic
-- Data encryption/decryption
-
-### Test Quality Rules
-
-#### DO:
-- Test behavior, not implementation details
-- Write independent tests (no shared state)
-- Use descriptive test names
-- Cover edge cases (null, empty, boundary)
-- Test error paths, not just happy paths
-
-#### DON'T:
-- Test private methods directly
-- Mock everything (prefer integration tests)
-- Skip tests with `.skip` or `.only`
-- Leave debug statements in test files
-- Write tests that depend on other tests
-
-### Edge Cases to Always Test
-
-1. **Null/Undefined** - What if input is null?
-2. **Empty** - What if array/string is empty?
-3. **Invalid Types** - What if wrong type passed?
-4. **Boundaries** - Min/max values (0, -1, MAX_INT)
-5. **Errors** - Network failures, database errors
-6. **Special Characters** - Unicode, SQL injection chars
+| Type | Minimum |
+|------|---------|
+| Unit Tests | 80% |
+| Integration Tests | Critical paths |
+| Pipeline Tests | Each stage independently |
 
 ---
 
@@ -465,14 +561,28 @@ Add your project-specific coding rules here:
 
 Before submitting code:
 
-- [ ] Follows naming conventions
-- [ ] Has appropriate type hints/annotations
-- [ ] Includes docstrings/documentation
+- [ ] Follows naming conventions (snake_case functions, PascalCase classes)
+- [ ] Has appropriate type hints on all public functions
+- [ ] Includes docstrings with parameter descriptions
 - [ ] Has unit tests for new functionality
-- [ ] Passes linter checks
-- [ ] Passes type checker
+- [ ] Passes linter checks (`ruff check`)
+- [ ] Passes type checker (`mypy` or `pyright`)
 - [ ] No hardcoded secrets/credentials
-- [ ] Handles errors appropriately
+- [ ] Handles errors appropriately (no bare `except`)
+- [ ] Uses `pathlib.Path` instead of string paths
+- [ ] Uses `logging` instead of `print()` for diagnostics
+
+### Scientific Python Review
+
+- [ ] Array shapes documented in docstrings and comments
+- [ ] Random seeds set explicitly for reproducibility
+- [ ] Physical units documented (variable names or comments)
+- [ ] Data validation at pipeline boundaries (input/output)
+- [ ] CRS handled explicitly for all geospatial operations
+- [ ] Nodata values handled (not silently included in computations)
+- [ ] Numerical tolerances used for floating-point comparisons
+- [ ] Experiment parameters logged (not just results)
+- [ ] No placeholder values in data pipelines (fail explicitly instead)
 
 ---
 
