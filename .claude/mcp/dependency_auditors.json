@@ -1,0 +1,252 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "dependency-auditors",
+  "description": "MCP configuration for dependency security auditing and version management",
+  "version": "1.0.0",
+
+  "securityAuditors": {
+    "pip-audit": {
+      "language": "python",
+      "command": "pip-audit",
+      "detection": ["requirements.txt", "pyproject.toml", "setup.py", "Pipfile"],
+      "capabilities": {
+        "audit": "pip-audit",
+        "auditRequirements": "pip-audit -r requirements.txt",
+        "auditStrict": "pip-audit --strict",
+        "fix": "pip-audit --fix",
+        "auditJson": "pip-audit --format json"
+      },
+      "outputParsing": {
+        "vulnerabilityPattern": "(\\S+)\\s+(\\S+)\\s+(\\S+)\\s+(PYSEC-\\d+-\\d+|CVE-\\d+-\\d+)",
+        "fixedVersionPattern": "fix available: (\\S+)"
+      },
+      "databases": ["PyPI Advisory Database", "OSV"]
+    },
+
+    "safety": {
+      "language": "python",
+      "command": "safety",
+      "detection": ["requirements.txt", "Pipfile.lock"],
+      "capabilities": {
+        "check": "safety check -r requirements.txt",
+        "checkJson": "safety check -r requirements.txt --json",
+        "checkFull": "safety check --full-report -r requirements.txt"
+      },
+      "outputParsing": {
+        "vulnerabilityPattern": "->\\s+(\\S+)\\s+affected\\s+by"
+      },
+      "requiresApiKey": false
+    },
+
+    "npm-audit": {
+      "language": "javascript",
+      "command": "npm audit",
+      "detection": ["package.json", "package-lock.json"],
+      "capabilities": {
+        "audit": "npm audit",
+        "auditJson": "npm audit --json",
+        "fix": "npm audit fix",
+        "fixForce": "npm audit fix --force",
+        "auditProduction": "npm audit --production"
+      },
+      "outputParsing": {
+        "vulnerabilityPattern": "(low|moderate|high|critical)",
+        "summaryPattern": "(\\d+) vulnerabilities"
+      },
+      "databases": ["npm Advisory Database", "GitHub Advisory Database"]
+    },
+
+    "yarn-audit": {
+      "language": "javascript",
+      "command": "yarn audit",
+      "detection": ["yarn.lock"],
+      "capabilities": {
+        "audit": "yarn audit",
+        "auditJson": "yarn audit --json"
+      },
+      "outputParsing": {
+        "vulnerabilityPattern": "(info|low|moderate|high|critical)"
+      },
+      "databases": ["npm Advisory Database"]
+    },
+
+    "cargo-audit": {
+      "language": "rust",
+      "command": "cargo audit",
+      "detection": ["Cargo.toml", "Cargo.lock"],
+      "capabilities": {
+        "audit": "cargo audit",
+        "auditJson": "cargo audit --json",
+        "fix": "cargo audit fix"
+      },
+      "outputParsing": {
+        "vulnerabilityPattern": "RUSTSEC-\\d+-\\d+"
+      },
+      "databases": ["RustSec Advisory Database"]
+    },
+
+    "govulncheck": {
+      "language": "go",
+      "command": "govulncheck",
+      "detection": ["go.mod"],
+      "capabilities": {
+        "audit": "govulncheck ./...",
+        "auditJson": "govulncheck -json ./..."
+      },
+      "outputParsing": {
+        "vulnerabilityPattern": "GO-\\d+-\\d+"
+      },
+      "databases": ["Go Vulnerability Database"]
+    }
+  },
+
+  "outdatedCheckers": {
+    "pip": {
+      "language": "python",
+      "command": "pip list --outdated",
+      "detection": ["requirements.txt", "pyproject.toml"],
+      "capabilities": {
+        "check": "pip list --outdated",
+        "checkJson": "pip list --outdated --format=json"
+      },
+      "outputParsing": {
+        "packagePattern": "(\\S+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)"
+      }
+    },
+
+    "npm": {
+      "language": "javascript",
+      "command": "npm outdated",
+      "detection": ["package.json"],
+      "capabilities": {
+        "check": "npm outdated",
+        "checkJson": "npm outdated --json"
+      },
+      "outputParsing": {
+        "packagePattern": "(\\S+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)"
+      }
+    },
+
+    "cargo": {
+      "language": "rust",
+      "command": "cargo outdated",
+      "detection": ["Cargo.toml"],
+      "capabilities": {
+        "check": "cargo outdated",
+        "checkJson": "cargo outdated --format json"
+      },
+      "outputParsing": {}
+    },
+
+    "go": {
+      "language": "go",
+      "command": "go list -m -u all",
+      "detection": ["go.mod"],
+      "capabilities": {
+        "check": "go list -m -u all"
+      },
+      "outputParsing": {
+        "updatePattern": "\\[([^\\]]+)\\]"
+      }
+    }
+  },
+
+  "licenseCheckers": {
+    "pip-licenses": {
+      "language": "python",
+      "command": "pip-licenses",
+      "capabilities": {
+        "list": "pip-licenses",
+        "listJson": "pip-licenses --format=json",
+        "listCsv": "pip-licenses --format=csv"
+      }
+    },
+
+    "license-checker": {
+      "language": "javascript",
+      "command": "npx license-checker",
+      "capabilities": {
+        "list": "npx license-checker",
+        "listJson": "npx license-checker --json",
+        "summary": "npx license-checker --summary"
+      }
+    },
+
+    "cargo-license": {
+      "language": "rust",
+      "command": "cargo license",
+      "capabilities": {
+        "list": "cargo license",
+        "listJson": "cargo license --json"
+      }
+    }
+  },
+
+  "severityLevels": {
+    "critical": {
+      "level": 4,
+      "action": "block",
+      "description": "Remote code execution, data breach potential"
+    },
+    "high": {
+      "level": 3,
+      "action": "warn",
+      "description": "Significant security impact"
+    },
+    "moderate": {
+      "level": 2,
+      "action": "info",
+      "description": "Limited security impact"
+    },
+    "low": {
+      "level": 1,
+      "action": "info",
+      "description": "Minimal security impact"
+    }
+  },
+
+  "defaultAllowedLicenses": [
+    "MIT",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Unlicense",
+    "0BSD",
+    "CC0-1.0",
+    "WTFPL"
+  ],
+
+  "reviewRequiredLicenses": [
+    "GPL-2.0",
+    "GPL-3.0",
+    "LGPL-2.1",
+    "LGPL-3.0",
+    "MPL-2.0",
+    "EPL-1.0",
+    "EPL-2.0"
+  ],
+
+  "forbiddenLicenses": [
+    "AGPL-3.0",
+    "SSPL-1.0",
+    "BUSL-1.1"
+  ],
+
+  "autoAudit": {
+    "enabled": true,
+    "onSessionStart": true,
+    "afterDependencyChange": true,
+    "beforeCommit": true,
+    "scheduledInterval": null
+  },
+
+  "globalSettings": {
+    "defaultTimeout": 120,
+    "cacheResults": true,
+    "cacheDuration": 3600,
+    "failOnCritical": true,
+    "failOnHigh": false,
+    "reportFormat": "detailed"
+  }
+}

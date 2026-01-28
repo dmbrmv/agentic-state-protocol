@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "test-runners",
+  "description": "MCP configuration for test runner integrations across multiple languages",
+  "version": "1.0.0",
+
+  "servers": {
+    "pytest": {
+      "language": "python",
+      "command": "pytest",
+      "detection": [
+        "pytest.ini",
+        "pyproject.toml:[tool.pytest]",
+        "conftest.py",
+        "setup.cfg:[tool:pytest]"
+      ],
+      "capabilities": {
+        "run": "pytest {scope} -v --tb=short",
+        "runVerbose": "pytest {scope} -vv --tb=long",
+        "runFailed": "pytest --lf -v",
+        "runChanged": "pytest --co -q | head -50",
+        "coverage": "pytest --cov={package} --cov-report=term-missing {scope}",
+        "watch": "pytest-watch -- -v",
+        "markers": "pytest --markers",
+        "collect": "pytest --collect-only -q"
+      },
+      "outputParsing": {
+        "passPattern": "\\d+ passed",
+        "failPattern": "FAILED|ERROR",
+        "skipPattern": "\\d+ skipped",
+        "summaryPattern": "=+ (\\d+) passed.*=+",
+        "coveragePattern": "TOTAL\\s+\\d+\\s+\\d+\\s+(\\d+)%"
+      },
+      "defaultArgs": ["-v", "--tb=short"],
+      "timeoutSeconds": 300
+    },
+
+    "jest": {
+      "language": "javascript",
+      "command": "npx jest",
+      "detection": [
+        "jest.config.js",
+        "jest.config.ts",
+        "jest.config.mjs",
+        "package.json:jest"
+      ],
+      "capabilities": {
+        "run": "npx jest {scope} --verbose",
+        "runFailed": "npx jest --onlyFailures",
+        "runChanged": "npx jest --changedSince=HEAD~1",
+        "runWatch": "npx jest --watch",
+        "coverage": "npx jest --coverage {scope}",
+        "updateSnapshots": "npx jest --updateSnapshot",
+        "listTests": "npx jest --listTests"
+      },
+      "outputParsing": {
+        "passPattern": "PASS",
+        "failPattern": "FAIL",
+        "summaryPattern": "Tests:\\s+(\\d+) passed",
+        "coveragePattern": "All files\\s+\\|\\s+[\\d.]+\\s+\\|\\s+[\\d.]+\\s+\\|\\s+[\\d.]+\\s+\\|\\s+([\\d.]+)"
+      },
+      "defaultArgs": ["--verbose"],
+      "timeoutSeconds": 300
+    },
+
+    "vitest": {
+      "language": "javascript",
+      "command": "npx vitest",
+      "detection": [
+        "vitest.config.js",
+        "vitest.config.ts",
+        "vite.config.js:test",
+        "vite.config.ts:test"
+      ],
+      "capabilities": {
+        "run": "npx vitest run {scope}",
+        "runWatch": "npx vitest",
+        "coverage": "npx vitest run --coverage {scope}",
+        "ui": "npx vitest --ui"
+      },
+      "outputParsing": {
+        "passPattern": "✓",
+        "failPattern": "✗|FAIL",
+        "summaryPattern": "(\\d+) passed"
+      },
+      "defaultArgs": ["run"],
+      "timeoutSeconds": 300
+    },
+
+    "cargo-test": {
+      "language": "rust",
+      "command": "cargo test",
+      "detection": ["Cargo.toml"],
+      "capabilities": {
+        "run": "cargo test {scope} -- --nocapture",
+        "runQuiet": "cargo test {scope}",
+        "runDoc": "cargo test --doc",
+        "runIgnored": "cargo test -- --ignored",
+        "coverage": "cargo tarpaulin --out Html"
+      },
+      "outputParsing": {
+        "passPattern": "ok",
+        "failPattern": "FAILED",
+        "summaryPattern": "(\\d+) passed.*\\d+ failed"
+      },
+      "defaultArgs": ["--", "--nocapture"],
+      "timeoutSeconds": 600
+    },
+
+    "go-test": {
+      "language": "go",
+      "command": "go test",
+      "detection": ["go.mod", "*_test.go"],
+      "capabilities": {
+        "run": "go test {scope} -v",
+        "runShort": "go test {scope} -short",
+        "runRace": "go test {scope} -race",
+        "coverage": "go test {scope} -coverprofile=coverage.out && go tool cover -func=coverage.out",
+        "coverageHtml": "go test {scope} -coverprofile=coverage.out && go tool cover -html=coverage.out",
+        "bench": "go test {scope} -bench=."
+      },
+      "outputParsing": {
+        "passPattern": "PASS",
+        "failPattern": "FAIL",
+        "summaryPattern": "ok\\s+.*\\s+([\\d.]+)s"
+      },
+      "defaultArgs": ["-v"],
+      "timeoutSeconds": 300
+    },
+
+    "make-test": {
+      "language": "generic",
+      "command": "make test",
+      "detection": ["Makefile:test"],
+      "capabilities": {
+        "run": "make test",
+        "runVerbose": "make test VERBOSE=1"
+      },
+      "outputParsing": {
+        "passPattern": "PASS|OK|Success",
+        "failPattern": "FAIL|ERROR|Failed"
+      },
+      "timeoutSeconds": 600
+    }
+  },
+
+  "autoDetection": {
+    "enabled": true,
+    "priority": ["pytest", "jest", "vitest", "cargo-test", "go-test", "make-test"],
+    "fallbackCommand": null
+  },
+
+  "globalSettings": {
+    "defaultTimeout": 300,
+    "maxRetries": 2,
+    "captureOutput": true,
+    "failFast": false
+  }
+}
