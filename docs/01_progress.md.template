@@ -1,0 +1,89 @@
+# {{PROJECT_NAME}} - Progress Tracker
+
+**Current Goal**: {{INITIAL_GOAL}}
+**Active Task**: Initial project setup
+**Progress**: 0%
+**Last Updated**: {{DATE}}
+
+---
+
+## I. Active Task
+
+### Initial Project Setup
+**Status**: In Progress
+**Started**: {{DATE}}
+
+**Objectives**:
+- [ ] Configure development environment
+- [ ] Verify all tools installed
+- [ ] Run initial test suite
+- [ ] Familiarize with project structure
+
+---
+
+## II. Recent Updates
+
+- {{DATE}}: Project initialized with Agentic State Protocol v3.0
+
+---
+
+## III. Backlog
+
+### High Priority
+
+1. **[Your first task here]**
+   - Status: Not started
+   - Description: Add your first real task
+
+### Medium Priority
+
+(none yet)
+
+### Low Priority
+
+(none yet)
+
+---
+
+## IV. Completed Tasks
+
+(none yet)
+
+---
+
+## V. Known Issues & Blockers
+
+(none yet - see `docs/02_issues.md` for issue tracking)
+
+---
+
+## VI. Environment Status
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Development Environment | Pending | Run setup commands from `docs/05_guides.md` |
+| Dependencies | Pending | Install required packages |
+| Tests | Pending | Verify test suite passes |
+| Documentation | Done | Protocol v3.0 initialized |
+
+---
+
+## VII. Metrics
+
+| Metric | Value |
+|--------|-------|
+| Tasks Completed | 0 |
+| Open Issues | 0 |
+| Test Coverage | N/A |
+
+---
+
+## VIII. Decision Log
+
+| Date | Decision | Rationale |
+|------|----------|-----------|
+| {{DATE}} | Adopt Agentic State Protocol v3.0 | Disciplined AI-assisted development |
+
+---
+
+**Next Action**: Complete "Initial Project Setup" task, then `/done` to proceed.

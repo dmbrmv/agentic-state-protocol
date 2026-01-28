@@ -1,0 +1,217 @@
+# {{PROJECT_NAME}} - System Architecture
+
+**Last Updated**: {{DATE}}
+
+---
+
+## I. Architecture Overview
+
+{{PROJECT_DESCRIPTION}}
+
+### Selected Pattern: {{ARCHITECTURE_PATTERN}}
+
+---
+
+## II. Architecture Patterns (Reference)
+
+### Pattern A: Monolithic Application
+
+Best for: Single-purpose applications, CLIs, data processing tools, research utilities.
+
+```
+┌─────────────────────────────────────────────┐
+│            Presentation Layer               │
+│           (CLI / Web UI / API)              │
+├─────────────────────────────────────────────┤
+│            Business Logic                   │
+│     (Core application functionality)        │
+├─────────────────────────────────────────────┤
+│             Data Layer                      │
+│   (Database / File System / External APIs)  │
+└─────────────────────────────────────────────┘
+```
+
+**File Structure**:
+```
+src/
+├── cli/           # CLI commands (Typer)
+├── core/          # Business logic
+├── models/        # Data models
+├── utils/         # Utilities
+└── config/        # Configuration
+```
+
+---
+
+### Pattern B: Data Pipeline
+
+Best for: ETL processes, data processing, scientific computing, ML pipelines, earth science workflows.
+
+```
+┌────────────┐   ┌────────────┐   ┌────────────┐   ┌────────────┐
+│  Acquire   │ → │  Process   │ → │  Analyze   │ → │  Export    │
+│            │   │            │   │            │   │            │
+│ - Download │   │ - Reproject│   │ - Model    │   │ - GeoTIFF  │
+│ - Extract  │   │ - Resample │   │ - Stats    │   │ - NetCDF   │
+│ - Validate │   │ - Clip/Mask│   │ - Classify │   │ - CSV/JSON │
+└────────────┘   └────────────┘   └────────────┘   └────────────┘
+```
+
+**File Structure**:
+```
+src/
+├── ingestion/     # Data acquisition and loaders
+├── processing/    # Transformations, reprojection, resampling
+├── analysis/      # Scientific analysis, modeling
+├── storage/       # Data persistence and cataloging
+├── serving/       # Output generation, export
+└── utils/         # Shared utilities
+```
+
+**Data Directory Convention**:
+```
+data/
+├── raw/           # Original downloaded data (read-only)
+├── processed/     # Intermediate products
+└── output/        # Final analysis results
+```
+
+---
+
+### Pattern C: ML Research Project
+
+Best for: Machine learning experiments, model training, hyperparameter optimization, research.
+
+```
+┌────────────┐   ┌────────────┐   ┌────────────┐   ┌────────────┐
+│  Data      │ → │  Feature   │ → │  Train     │ → │  Evaluate  │
+│            │   │            │   │            │   │            │
+│ - Load     │   │ - Engineer │   │ - Fit      │   │ - Metrics  │
+│ - Clean    │   │ - Select   │   │ - Optimize │   │ - Plots    │
+│ - Split    │   │ - Scale    │   │ - Validate │   │ - Compare  │
+└────────────┘   └────────────┘   └────────────┘   └────────────┘
+```
+
+**File Structure**:
+```
+src/
+├── data/          # Data loading and preprocessing
+├── models/        # Model definitions
+├── training/      # Training loops, hyperparameter search
+├── evaluation/    # Metrics, visualization, comparison
+└── utils/         # Shared utilities
+
+experiments/       # Experiment configs and results
+notebooks/         # Marimo notebooks for exploration
+models/            # Trained model artifacts (gitignored)
+```
+
+**Key Principles**:
+- Reproducibility via explicit seeds and config files
+- Temporal splitting for time series (never random split)
+- Separation of notebook exploration from production code
+- Experiment tracking with configs alongside metrics
+
+---
+
+## III. Earth Science / ML Architecture Patterns
+
+### Geospatial Data Pipeline Stages
+
+Earth science projects typically follow a multi-stage pipeline where each stage
+has specific data format expectations and quality checks:
+
+| Stage | Input | Output | Key Libraries |
+|-------|-------|--------|---------------|
+| **Acquisition** | URLs, API endpoints | Raw files (GeoTIFF, NetCDF, CSV) | requests, cdsapi, earthaccess |
+| **Preprocessing** | Raw rasters/vectors | Aligned, cleaned data | rasterio, geopandas, xarray |
+| **Analysis** | Processed data | Derived products, statistics | numpy, scipy, scikit-learn |
+| **Modeling** | Features, targets | Trained models, predictions | xgboost, optuna, pytorch |
+| **Visualization** | Results, spatial data | Maps, plots, dashboards | matplotlib, folium, streamlit |
+| **Export** | Analysis products | Shareable formats | rasterio, netcdf4, geopandas |
+
+### Common Data Formats
+
+| Format | Use Case | Library |
+|--------|----------|---------|
+| GeoTIFF | Raster data (DEM, land use, satellite) | rasterio |
+| NetCDF | Gridded time series (climate, model output) | xarray, netcdf4 |
+| GeoPackage | Vector data (basins, stations, boundaries) | geopandas |
+| GeoJSON | Lightweight vector exchange | geopandas |
+| Parquet | Tabular data (features, time series) | pandas, geopandas |
+| Zarr | Cloud-optimized array storage | xarray, zarr |
+
+### CRS and Resolution Management
+
+Projects dealing with spatial data must establish conventions early:
+
+- **Working CRS**: Choose a projected CRS for analysis (e.g., UTM zone)
+- **Storage CRS**: Use EPSG:4326 for data exchange and visualization
+- **Resolution alignment**: All rasters resampled to a common grid before analysis
+- **NoData handling**: Consistent nodata values across all raster products
+
+---
+
+## IV. Your Project Structure
+
+**Selected Pattern**: {{ARCHITECTURE_PATTERN}}
+
+```
+{{PROJECT_SLUG}}/
+├── docs/                   # Documentation (Agentic Protocol)
+├── src/{{PROJECT_SLUG}}/   # Main source code
+│   ├── __init__.py
+│   └── [modules...]        # Your modules here
+├── tests/                  # Test suite
+├── scripts/                # Utility scripts
+├── configs/                # Configuration files
+└── .claude/                # Claude Code integration
+```
+
+---
+
+## V. Component Descriptions
+
+### Core Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| [Component 1] | `src/{{PROJECT_SLUG}}/[module]` | [Description] |
+| [Component 2] | `src/{{PROJECT_SLUG}}/[module]` | [Description] |
+
+### External Dependencies
+
+| Dependency | Version | Purpose |
+|------------|---------|---------|
+| [Package 1] | X.Y.Z | [Why needed] |
+| [Package 2] | X.Y.Z | [Why needed] |
+
+---
+
+## VI. Data Flow
+
+```
+[Input] → [Process 1] → [Process 2] → [Output]
+
+Describe your data flow here.
+```
+
+---
+
+## VII. Key Design Decisions
+
+| Decision | Rationale | Date |
+|----------|-----------|------|
+| Adopted {{ARCHITECTURE_PATTERN}} pattern | [Why this pattern fits] | {{DATE}} |
+| [Decision 2] | [Rationale] | [Date] |
+
+---
+
+## VIII. Future Considerations
+
+- [ ] [Future enhancement 1]
+- [ ] [Future enhancement 2]
+
+---
+
+**Next Action**: Fill in your specific components and data flow.

@@ -1,0 +1,88 @@
+# {{PROJECT_NAME}} - Session Context Log
+
+**Purpose**: Persistent memory across AI sessions. Each session logs key decisions, actions, and context for the next agent.
+
+---
+
+## Session Template
+
+When logging a session, use this format:
+
+```markdown
+## Session: YYYY-MM-DD - [Brief Session Name]
+
+**Time**: HH:MM - HH:MM
+**Agent**: [Claude / GPT / etc.]
+**Mode**: [Execution | Planning | Refactoring]
+
+### Objective
+[What was the goal of this session?]
+
+### Actions Taken
+- [Action 1]
+- [Action 2]
+- [Action 3]
+
+### Files Created/Modified
+- `path/to/file1.py` - [Brief description]
+- `path/to/file2.py` - [Brief description]
+
+### Decisions Made
+- [Decision 1]: [Rationale]
+- [Decision 2]: [Rationale]
+
+### Issues Encountered
+- [Issue 1]: [How resolved or left open]
+
+### Context for Next Session
+[Critical information the next agent needs to know]
+
+---
+**CHECKPOINT**: [One-line summary of session outcome]
+```
+
+---
+
+## Session Log
+
+### Session: {{DATE}} - Project Initialization
+
+**Time**: --:-- - --:--
+**Agent**: Claude
+**Mode**: Execution
+
+### Objective
+Initialize project with Agentic State Protocol v3.0
+
+### Actions Taken
+- Created documentation structure
+- Set up protocol files
+- Initialized progress tracker
+
+### Files Created/Modified
+- `docs/00_MASTER_INDEX.md` - Protocol specification
+- `docs/01_progress.md` - Progress tracker
+- `docs/02_issues.md` - Issue registry
+- `docs/03_architecture.md` - System architecture
+- `docs/04_standards.md` - Coding standards
+- `docs/05_guides.md` - Environment guides
+- `docs/logs/session_context.md` - This file
+- `CLAUDE.md` - Agent instructions
+
+### Decisions Made
+- Adopted Agentic State Protocol v3.0 for disciplined development
+
+### Issues Encountered
+- None
+
+### Context for Next Session
+- Project is freshly initialized
+- Active task: "Initial Project Setup"
+- Run `/boot` to see current state
+
+---
+**CHECKPOINT**: Project initialized with Agentic State Protocol v3.0, ready for development.
+
+---
+
+<!-- New sessions will be appended below -->

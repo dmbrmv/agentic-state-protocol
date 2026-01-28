@@ -1,0 +1,589 @@
+# {{PROJECT_NAME}} - Coding Standards
+
+**Tech Stack**: {{TECH_STACK}}
+**Last Updated**: {{DATE}}
+
+---
+
+## I. Golden Rules
+
+1. **Consistency over preference** - Follow existing patterns in the codebase
+2. **Readability over cleverness** - Code is read more than written
+3. **Explicit over implicit** - Make intentions clear
+4. **Test what matters** - Critical paths need tests
+5. **Reproducibility is non-negotiable** - Every result must be reproducible
+
+---
+
+## II. Python Standards
+
+### Core Conventions
+
+**Formatter**: `ruff format` (or `black`)
+**Linter**: `ruff check` (or `flake8`)
+**Type Checker**: `pyright` (or `mypy`)
+**Line Length**: 88 characters
+
+```python
+# Imports: stdlib, third-party, local (separated by blank lines)
+import os
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+from myproject.core import utils
+
+
+# Type hints on all public functions
+def process_data(input_path: Path, *, verbose: bool = False) -> dict[str, Any]:
+    """Process data from input file.
+
+    Args:
+        input_path: Path to input file.
+        verbose: Enable verbose output.
+
+    Returns:
+        Processed data as dictionary.
+
+    Raises:
+        FileNotFoundError: If input file doesn't exist.
+    """
+    ...
+
+
+# Classes: PascalCase
+class DataProcessor:
+    """Process and transform data."""
+
+    # Class constants: UPPER_SNAKE_CASE
+    MAX_RETRIES = 3
+
+    def __init__(self, config: dict) -> None:
+        self._config = config  # Private: single underscore
+
+    # Methods: snake_case
+    def run_pipeline(self) -> None:
+        ...
+
+
+# Constants: UPPER_SNAKE_CASE
+DEFAULT_TIMEOUT = 30
+API_BASE_URL = "https://api.example.com"
+```
+
+**Docstrings**: Google format (preferred) or NumPy format for scientific code
+```python
+def function(arg1: str, arg2: int) -> bool:
+    """Short description.
+
+    Longer description if needed.
+
+    Args:
+        arg1: Description of arg1.
+        arg2: Description of arg2.
+
+    Returns:
+        Description of return value.
+
+    Raises:
+        ValueError: When arg1 is empty.
+
+    Example:
+        >>> function("test", 42)
+        True
+    """
+```
+
+### Scientific Computing
+
+**NumPy Docstrings** (for array-heavy functions):
+```python
+def compute_flow(
+    precipitation: np.ndarray,
+    area_km2: float,
+    timestep_hours: float = 1.0,
+) -> np.ndarray:
+    """Compute streamflow from precipitation using unit hydrograph.
+
+    Parameters
+    ----------
+    precipitation : np.ndarray
+        Precipitation time series in mm. Shape: (n_timesteps,).
+    area_km2 : float
+        Catchment area in square kilometers. Must be positive.
+    timestep_hours : float, optional
+        Time step duration in hours. Default is 1.0.
+
+    Returns
+    -------
+    np.ndarray
+        Streamflow time series in m3/s. Shape: (n_timesteps,).
+
+    Raises
+    ------
+    ValueError
+        If precipitation contains negative values or area_km2 <= 0.
+
+    Notes
+    -----
+    Uses the SCS curve number method. Reference: USDA-SCS (1972).
+
+    Examples
+    --------
+    >>> precip = np.array([0.0, 5.2, 12.1, 3.4])
+    >>> flow = compute_flow(precip, area_km2=150.0)
+    >>> flow.shape
+    (4,)
+    """
+```
+
+**Array Shape Documentation**: Always document array shapes in docstrings and use comments for intermediate shapes:
+```python
+# Shape: (n_stations, n_timesteps)
+obs_data = np.zeros((n_stations, n_timesteps))
+
+# Shape: (n_lat, n_lon) -> (n_cells,)
+flat_grid = grid_data.ravel()
+```
+
+**xarray Conventions**:
+```python
+import xarray as xr
+
+# Use meaningful dimension names
+ds = xr.Dataset(
+    {
+        "temperature": (["time", "lat", "lon"], temp_array),
+        "precipitation": (["time", "lat", "lon"], precip_array),
+    },
+    coords={
+        "time": pd.date_range("2020-01-01", periods=365),
+        "lat": lat_values,
+        "lon": lon_values,
+    },
+    attrs={
+        "source": "ERA5 reanalysis",
+        "units": "K for temperature, mm for precipitation",
+        "created": str(datetime.now()),
+    },
+)
+
+# Always include units in attrs
+ds["temperature"].attrs["units"] = "K"
+ds["precipitation"].attrs["units"] = "mm/day"
+```
+
+### Data Pipeline Conventions
+
+**Pandas Best Practices**:
+```python
+# Use method chaining for transformations
+result = (
+    df
+    .query("quality_flag == 'valid'")
+    .assign(
+        date=lambda x: pd.to_datetime(x["date_str"]),
+        flow_cms=lambda x: x["flow_cfs"] * 0.0283168,
+    )
+    .set_index("date")
+    .resample("D")
+    .mean()
+)
+
+# Explicit dtypes on read
+df = pd.read_csv(
+    path,
+    dtype={"station_id": str, "value": float},
+    parse_dates=["date"],
+)
+```
+
+**Data Validation**:
+```python
+# Validate inputs at pipeline boundaries
+def load_station_data(path: Path) -> pd.DataFrame:
+    """Load and validate station data."""
+    df = pd.read_csv(path)
+
+    # Validate schema
+    required_cols = {"station_id", "date", "value", "quality_flag"}
+    missing = required_cols - set(df.columns)
+    if missing:
+        raise ValueError(f"Missing required columns: {missing}")
+
+    # Validate data ranges
+    if (df["value"] < 0).any():
+        n_neg = (df["value"] < 0).sum()
+        raise ValueError(f"Found {n_neg} negative values in 'value' column")
+
+    # Validate no duplicates
+    dupes = df.duplicated(subset=["station_id", "date"])
+    if dupes.any():
+        raise ValueError(f"Found {dupes.sum()} duplicate station-date records")
+
+    return df
+```
+
+**Pipeline Stage Pattern**:
+```python
+def stage_name(input_path: Path, output_path: Path, *, overwrite: bool = False) -> Path:
+    """Pipeline stage: brief description.
+
+    Args:
+        input_path: Path to input data.
+        output_path: Path for output data.
+        overwrite: If True, overwrite existing output.
+
+    Returns:
+        Path to output file.
+
+    Raises:
+        FileExistsError: If output exists and overwrite is False.
+        ValueError: If input data fails validation.
+    """
+    if output_path.exists() and not overwrite:
+        raise FileExistsError(f"Output exists: {output_path}")
+
+    # Load and validate input
+    data = load_and_validate(input_path)
+
+    # Process
+    result = transform(data)
+
+    # Validate output
+    validate_output(result)
+
+    # Write
+    result.to_parquet(output_path)
+    return output_path
+```
+
+### Earth Science / Geospatial
+
+**CRS Handling**:
+```python
+import rasterio
+from pyproj import CRS
+
+# Always be explicit about CRS
+TARGET_CRS = CRS.from_epsg(4326)  # WGS84
+
+# Validate CRS on load
+with rasterio.open(dem_path) as src:
+    if src.crs is None:
+        raise ValueError(f"No CRS defined for {dem_path}")
+    if src.crs != TARGET_CRS:
+        logger.warning(f"CRS mismatch: {src.crs} != {TARGET_CRS}, reprojecting")
+```
+
+**GeoPandas Conventions**:
+```python
+import geopandas as gpd
+
+# Always check and set CRS explicitly
+gdf = gpd.read_file(shapefile_path)
+if gdf.crs is None:
+    raise ValueError(f"No CRS in {shapefile_path}")
+
+# Reproject before spatial operations between datasets
+gdf_proj = gdf.to_crs(epsg=32637)  # UTM zone for area calculations
+
+# Document coordinate units
+# Area in m2 (UTM projection)
+gdf_proj["area_m2"] = gdf_proj.geometry.area
+# Convert to km2
+gdf_proj["area_km2"] = gdf_proj["area_m2"] / 1e6
+```
+
+**Rasterio Patterns**:
+```python
+# Always use context managers
+with rasterio.open(input_path) as src:
+    data = src.read(1)  # Band 1
+    profile = src.profile.copy()
+    nodata = src.nodata
+
+# Handle nodata explicitly
+if nodata is not None:
+    valid_mask = data != nodata
+    data = np.where(valid_mask, data, np.nan)
+
+# Update profile for output
+profile.update(dtype="float32", compress="lz4", nodata=-9999.0)
+with rasterio.open(output_path, "w", **profile) as dst:
+    dst.write(result, 1)
+```
+
+### ML Conventions
+
+**Reproducibility**:
+```python
+import random
+import numpy as np
+
+RANDOM_SEED = 42
+
+def set_reproducible(seed: int = RANDOM_SEED) -> None:
+    """Set all random seeds for reproducibility."""
+    random.seed(seed)
+    np.random.seed(seed)
+    # Add framework-specific seeds (torch, tf) as needed
+
+# Always log experiment parameters
+logger.info(
+    "Experiment config: seed=%d, n_trials=%d, algorithm=%s",
+    seed, n_trials, algorithm,
+)
+```
+
+**Experiment Tracking**:
+```python
+# Log all hyperparameters, metrics, and artifacts
+# Use structured logging or dedicated tracking (MLflow, Optuna)
+experiment_config = {
+    "algorithm": "NSGA-II",
+    "n_generations": 100,
+    "population_size": 50,
+    "objective": ["NSE", "PBIAS"],
+    "seed": RANDOM_SEED,
+    "timestamp": datetime.now().isoformat(),
+}
+
+# Save config alongside results
+with open(output_dir / "config.json", "w") as f:
+    json.dump(experiment_config, f, indent=2)
+```
+
+**Model Evaluation**:
+```python
+# Always report multiple metrics
+metrics = {
+    "NSE": compute_nse(obs, sim),
+    "KGE": compute_kge(obs, sim),
+    "PBIAS": compute_pbias(obs, sim),
+    "RMSE": compute_rmse(obs, sim),
+    "R2": compute_r2(obs, sim),
+}
+
+# Include confidence intervals or uncertainty where possible
+# Document the evaluation period
+logger.info("Evaluation period: %s to %s", start_date, end_date)
+logger.info("Metrics: %s", metrics)
+```
+
+### Notebook Conventions (Marimo)
+
+**Structure**:
+```python
+# Cell 1: Imports and configuration (always first)
+import marimo as mo
+import numpy as np
+import pandas as pd
+
+# Cell 2: Data loading (separate from processing)
+# Use explicit paths, never relative from notebook location
+DATA_DIR = Path("/mnt/storage/ResearchData/HydroHub")
+
+# Cell 3+: Analysis steps (one concept per cell)
+# Each cell should have a clear purpose documented in a markdown cell above it
+
+# Final cells: Results summary and visualization
+```
+
+**Notebook Rules**:
+1. No side effects between cells (each cell is self-contained given its inputs)
+2. Use `mo.ui` elements for interactive parameters, not hardcoded values
+3. Pin all dependency versions in the notebook header
+4. Include a "Results Summary" cell at the end
+5. Never store large data in notebook state -- load from disk
+
+---
+
+## III. Git Standards
+
+### Commit Messages
+
+Format: `<type>(<scope>): <description>`
+
+**Types**:
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation only
+- `style`: Formatting, no code change
+- `refactor`: Code restructuring
+- `test`: Adding tests
+- `chore`: Maintenance tasks
+- `perf`: Performance improvement
+- `data`: Data pipeline or data processing changes
+
+**Examples**:
+```
+feat(calibration): add multi-objective optimization with NSGA-II
+fix(pipeline): handle missing nodata values in DEM processing
+docs(readme): update installation instructions
+refactor(core): extract validation logic to separate module
+test(diagnostics): add unit tests for NSE calculation
+data(weather): add ERA5 precipitation downscaling stage
+```
+
+### Branch Names
+
+Format: `<type>/<short-description>`
+
+**Examples**:
+```
+feature/multi-objective-calibration
+fix/dem-nodata-handling
+docs/update-readme
+refactor/extract-validation
+data/era5-downscaling
+```
+
+---
+
+## IV. Testing Standards
+
+### Test File Naming
+
+| Pattern | Convention |
+|---------|-----------|
+| `test_<module>.py` | Standard pytest convention (preferred) |
+| `<module>_test.py` | Alternative pytest convention |
+| `conftest.py` | Shared fixtures per directory |
+
+### Test Structure (AAA Pattern)
+
+```python
+def test_process_data_returns_valid_result():
+    # Arrange
+    input_data = {"key": "value"}
+    processor = DataProcessor()
+
+    # Act
+    result = processor.process(input_data)
+
+    # Assert
+    assert result.is_valid()
+    assert result.key == "value"
+```
+
+### Scientific Computing Test Patterns
+
+**Tolerance-Based Assertions**:
+```python
+import numpy as np
+from numpy.testing import assert_allclose
+
+def test_nse_perfect_simulation():
+    """NSE should be 1.0 for perfect simulation."""
+    obs = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+    sim = obs.copy()
+    assert_allclose(compute_nse(obs, sim), 1.0, atol=1e-10)
+
+def test_flow_conservation():
+    """Total outflow should equal total inflow (mass balance)."""
+    inflow = np.random.RandomState(42).uniform(0, 100, size=365)
+    outflow = route_flow(inflow, params)
+    assert_allclose(outflow.sum(), inflow.sum(), rtol=0.01)
+```
+
+**Fixture Data**:
+```python
+import pytest
+
+@pytest.fixture
+def sample_hydrograph() -> np.ndarray:
+    """Synthetic hydrograph with known properties."""
+    rng = np.random.RandomState(42)
+    baseflow = 10.0
+    storm = np.concatenate([
+        np.zeros(10),
+        np.linspace(0, 50, 5),
+        np.exp(-np.linspace(0, 3, 20)) * 50,
+        np.zeros(10),
+    ])
+    return baseflow + storm + rng.normal(0, 0.5, len(storm) + 20)
+
+@pytest.fixture
+def sample_dem(tmp_path: Path) -> Path:
+    """Create a synthetic DEM raster for testing."""
+    import rasterio
+    from rasterio.transform import from_bounds
+
+    dem_path = tmp_path / "test_dem.tif"
+    data = np.random.RandomState(42).uniform(100, 500, (100, 100)).astype("float32")
+    transform = from_bounds(44.0, 42.0, 45.0, 43.0, 100, 100)
+    with rasterio.open(
+        dem_path, "w", driver="GTiff", height=100, width=100,
+        count=1, dtype="float32", crs="EPSG:4326", transform=transform,
+    ) as dst:
+        dst.write(data, 1)
+    return dem_path
+```
+
+**Parametrized Tests with Known Solutions**:
+```python
+@pytest.mark.parametrize(
+    "obs, sim, expected_nse",
+    [
+        (np.array([1, 2, 3]), np.array([1, 2, 3]), 1.0),
+        (np.array([1, 2, 3]), np.array([2, 2, 2]), 0.0),  # Mean prediction
+        (np.array([1, 2, 3]), np.array([3, 2, 1]), -3.0),  # Reversed
+    ],
+    ids=["perfect", "mean-only", "reversed"],
+)
+def test_nse_known_solutions(obs, sim, expected_nse):
+    assert_allclose(compute_nse(obs, sim), expected_nse, atol=1e-10)
+```
+
+### Coverage Requirements
+
+| Type | Minimum |
+|------|---------|
+| Unit Tests | 80% |
+| Integration Tests | Critical paths |
+| Pipeline Tests | Each stage independently |
+
+---
+
+## V. Project-Specific Rules
+
+Add your project-specific coding rules here:
+
+1. [Rule 1]
+2. [Rule 2]
+3. [Rule 3]
+
+---
+
+## VI. Code Review Checklist
+
+Before submitting code:
+
+- [ ] Follows naming conventions (snake_case functions, PascalCase classes)
+- [ ] Has appropriate type hints on all public functions
+- [ ] Includes docstrings with parameter descriptions
+- [ ] Has unit tests for new functionality
+- [ ] Passes linter checks (`ruff check`)
+- [ ] Passes type checker (`mypy` or `pyright`)
+- [ ] No hardcoded secrets/credentials
+- [ ] Handles errors appropriately (no bare `except`)
+- [ ] Uses `pathlib.Path` instead of string paths
+- [ ] Uses `logging` instead of `print()` for diagnostics
+
+### Scientific Python Review
+
+- [ ] Array shapes documented in docstrings and comments
+- [ ] Random seeds set explicitly for reproducibility
+- [ ] Physical units documented (variable names or comments)
+- [ ] Data validation at pipeline boundaries (input/output)
+- [ ] CRS handled explicitly for all geospatial operations
+- [ ] Nodata values handled (not silently included in computations)
+- [ ] Numerical tolerances used for floating-point comparisons
+- [ ] Experiment parameters logged (not just results)
+- [ ] No placeholder values in data pipelines (fail explicitly instead)
+
+---
+
+**Next Action**: Run linter and formatter before committing.

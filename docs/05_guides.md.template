@@ -1,0 +1,314 @@
+# {{PROJECT_NAME}} - Environment & Workflow Guides
+
+**Last Updated**: {{DATE}}
+
+---
+
+## I. Environment Setup
+
+### Prerequisites
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| Python | 3.10+ | Primary language |
+| Git | 2.x+ | Version control |
+| conda/mamba | Latest | Environment management |
+| GDAL | 3.x+ | Geospatial data processing (if needed) |
+
+### Python Environment with conda/mamba
+
+```bash
+# Clone the repository
+git clone {{REPO_URL}}
+cd {{PROJECT_SLUG}}
+
+# Create conda environment (preferred for geospatial projects)
+conda create -n {{PROJECT_SLUG}} python=3.11
+conda activate {{PROJECT_SLUG}}
+
+# For faster environment resolution, use mamba
+# conda install -n base -c conda-forge mamba
+# mamba create -n {{PROJECT_SLUG}} python=3.11
+
+# Install geospatial system dependencies via conda
+# (avoids manual GDAL compilation)
+conda install -c conda-forge gdal rasterio geopandas xarray netcdf4
+
+# Install project in editable mode
+pip install -e ".[dev]"
+
+# Verify installation
+python -c "import {{PROJECT_SLUG}}; print('OK')"
+```
+
+### GDAL / Geospatial Tool Installation
+
+GDAL and related geospatial C libraries are notoriously difficult to install via pip.
+Use conda/mamba to install them from conda-forge, which provides pre-built binaries:
+
+```bash
+# Core geospatial stack (install via conda, not pip)
+conda install -c conda-forge \
+    gdal \
+    rasterio \
+    geopandas \
+    shapely \
+    pyproj \
+    fiona \
+    netcdf4 \
+    hdf5
+
+# Verify GDAL installation
+python -c "from osgeo import gdal; print(f'GDAL {gdal.__version__}')"
+gdalinfo --version
+```
+
+**Common issues**:
+- **GDAL version mismatch**: Always install rasterio/fiona from the same channel as GDAL
+- **libspatialindex missing**: Install with `conda install -c conda-forge rtree`
+- **PROJ database not found**: Set `PROJ_LIB` if needed: `export PROJ_LIB=$(python -c "import pyproj; print(pyproj.datadir.get_data_dir())")`
+
+### Environment Variables
+
+Create a `.env` file (or export these):
+
+```bash
+# Required
+export PROJECT_ENV="development"
+
+# Optional
+export DEBUG="true"
+export LOG_LEVEL="info"
+
+# Geospatial (if not auto-detected)
+# export GDAL_DATA="/path/to/gdal/data"
+# export PROJ_LIB="/path/to/proj/data"
+```
+
+### Multiple Environment Management
+
+Some projects require separate environments for different dependency constraints:
+
+```bash
+# Main environment (e.g., numpy 1.x for pySWATPlus compatibility)
+conda create -n myproject python=3.11 numpy=1.26
+conda activate myproject
+pip install -e ".[dev]"
+
+# Secondary environment (e.g., numpy 2.x for SALib sensitivity analysis)
+conda create -n myproject-analysis python=3.11 numpy=2.0
+conda activate myproject-analysis
+pip install -e ".[analysis]"
+```
+
+Document which environment is required for which workflow in your project README.
+
+---
+
+## II. Development Workflow
+
+### Daily Workflow
+
+```bash
+# 1. Activate environment
+conda activate {{PROJECT_SLUG}}
+
+# 2. Start session
+/boot                           # Load project state
+
+# 3. Work on active task
+# ... make changes ...
+
+# 4. Run checks before commit
+ruff check src/ tests/
+ruff format --check src/ tests/
+pytest tests/ -v
+
+# 5. Save progress
+/save                           # Update docs, prepare commit
+
+# 6. Commit changes
+git add -A
+git commit -m "type(scope): description"
+```
+
+### Starting a New Feature
+
+```bash
+# 1. Create feature branch
+git checkout -b feature/my-feature
+
+# 2. Plan the feature
+/feature my-feature             # Creates task and plan
+
+# 3. Implement
+# ... follow the plan ...
+
+# 4. Complete
+/done                           # Mark task complete
+
+# 5. Push and create PR
+git push -u origin feature/my-feature
+```
+
+---
+
+## III. Common Tasks
+
+### Running the Application
+
+```bash
+# CLI tool
+{{PROJECT_SLUG}} --help
+
+# Or directly
+python -m {{PROJECT_SLUG}} --help
+```
+
+### Running Tests
+
+```bash
+# All tests
+pytest tests/ -v
+
+# Specific test file
+pytest tests/test_core.py -v
+
+# With coverage
+pytest tests/ --cov=src/{{PROJECT_SLUG}} --cov-report=term-missing
+```
+
+### Code Quality Checks
+
+```bash
+# Format code
+ruff format src/ tests/
+
+# Lint code
+ruff check src/ tests/
+
+# Auto-fix lint issues
+ruff check --fix src/ tests/
+
+# Type check
+pyright src/
+```
+
+### Building
+
+```bash
+# Build package
+python -m build
+
+# Install locally
+pip install -e ".[dev]"
+```
+
+---
+
+## IV. Agentic Protocol Commands
+
+### Core Commands
+
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `/boot` | Load project state | Start of session |
+| `/save` | Update docs, prepare commit | End of session |
+| `/done` | Mark task complete | After finishing task |
+| `/feature <name>` | Plan new feature | Before starting feature |
+| `/refine <prompt>` | Clarify vague request | When request is unclear |
+
+### Macro Triggers
+
+| Trigger | Action |
+|---------|--------|
+| "BOOT" | Same as `/boot` |
+| "SAVE" | Same as `/save` |
+| "DONE" | Same as `/done` |
+
+---
+
+## V. Troubleshooting
+
+### Common Issues
+
+#### Issue: GDAL/rasterio import fails
+
+**Symptoms**: `ImportError: libgdal.so not found` or similar
+
+**Cause**: GDAL installed via pip without system libraries, or environment not activated
+
+**Solution**:
+```bash
+# Ensure conda environment is active
+conda activate {{PROJECT_SLUG}}
+
+# Reinstall via conda-forge
+conda install -c conda-forge gdal rasterio fiona
+
+# Verify
+python -c "import rasterio; print(rasterio.__version__)"
+```
+
+#### Issue: CRS/projection errors
+
+**Symptoms**: `CRSError: Invalid projection` or empty/shifted geometries
+
+**Cause**: PROJ database not found or mismatched CRS
+
+**Solution**:
+```bash
+# Check PROJ installation
+python -c "import pyproj; print(pyproj.datadir.get_data_dir())"
+
+# Set PROJ_LIB if needed
+export PROJ_LIB=$(python -c "import pyproj; print(pyproj.datadir.get_data_dir())")
+```
+
+#### Issue: conda environment conflicts
+
+**Symptoms**: `PackagesNotFoundError` or long solve times
+
+**Cause**: Channel priority conflicts or incompatible package versions
+
+**Solution**:
+```bash
+# Use strict channel priority
+conda config --set channel_priority strict
+
+# Use mamba for faster solving
+mamba install -c conda-forge <package>
+
+# Nuclear option: recreate environment
+conda deactivate
+conda env remove -n {{PROJECT_SLUG}}
+mamba create -n {{PROJECT_SLUG}} python=3.11 -c conda-forge
+```
+
+### Getting Help
+
+1. Check `docs/02_issues.md` for known issues
+2. Search existing documentation
+3. Ask the team / open an issue
+
+---
+
+## VI. Resources
+
+### Documentation
+
+- [Python Packaging Guide](https://packaging.python.org/)
+- [rasterio Documentation](https://rasterio.readthedocs.io/)
+- [xarray Documentation](https://docs.xarray.dev/)
+- [GeoPandas Documentation](https://geopandas.org/)
+
+### Tools
+
+- [ruff](https://docs.astral.sh/ruff/) - Python linter and formatter
+- [pyright](https://github.com/microsoft/pyright) - Python type checker
+- [marimo](https://marimo.io/) - Reactive Python notebooks
+- [conda-forge](https://conda-forge.org/) - Community-maintained conda packages
+
+---
+
+**Next Action**: Complete environment setup and run verification commands.
